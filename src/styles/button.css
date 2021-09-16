@@ -1,0 +1,43 @@
+.xg-button {
+  line-height: 1.75;
+  @apply font-medium items-center;
+  @apply inline-flex justify-center rounded-md border;
+}
+
+.xg-button-mini {
+  padding: 1px 6px;
+  line-height: 1.5;
+  font-size: 0.75rem;
+  border-radius: 0.25rem;
+}
+
+.xg-button-medium {
+  padding: 5px 16px;
+  font-size: 0.875rem;
+}
+
+.xg-button-small {
+  padding: 3px 9px;
+  font-size: 0.8125rem;
+}
+
+.xg-button-large {
+  padding: 7px 21px;
+  font-size: 0.9375rem;
+}
+
+.xg-button-disabled {
+  @apply cursor-not-allowed;
+  @apply opacity-50 shadow-none;
+}
+.xg-button-outlined.xg-button-disabled {
+  @apply hover:border-opacity-50;
+}
+
+.xg-button-primary {
+}
+
+.xg-button-text,
+.xg-button-outlined {
+  @apply border-opacity-50  border;
+}

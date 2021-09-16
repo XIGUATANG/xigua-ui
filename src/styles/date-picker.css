@@ -1,0 +1,50 @@
+.xg-date-picker {
+  font-size: 0.8125rem;
+}
+.cell-text {
+  color: #19181a;
+  font-weight: normal;
+}
+
+.cell {
+  position: relative;
+}
+
+.cell-not-currentmonth {
+  opacity: 0.4;
+}
+.cell-day-available:not(.cell-in-range):not(.cell-start) {
+  @apply hover:bg-gray-200 rounded-lg;
+}
+
+.cell-day-available {
+  cursor: pointer;
+}
+
+.cell-day.today:not(.cell-in-range) {
+  @apply bg-gray-200 font-black;
+}
+.cell-day.today::before {
+  content: '';
+  display: block;
+  position: absolute;
+  @apply w-1 h-1;
+  border-radius: 50%;
+  left: 14px;
+  top: 0.125rem;
+  /* ICON GREY */
+  background: #77767f;
+}
+.cell-in-range:not(.cell-start):not(.cell-end) {
+  @apply text-purple-500;
+  background: #f8f7fa;
+}
+
+.cell.cell-start {
+  @apply bg-purple-500  text-white;
+  @apply rounded-l-lg rounded-r-none;
+}
+.cell.cell-end {
+  @apply bg-purple-500  text-white;
+  @apply rounded-r-lg rounded-l-none;
+}
