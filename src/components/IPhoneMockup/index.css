@@ -1,0 +1,128 @@
+.outer {
+  width: 415px;
+  height: 853px;
+  background: linear-gradient(180deg, #527190 0%, #2b4a69 100%);
+  border-radius: 65px;
+  padding: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.inner {
+  width: 403px;
+  height: 841px;
+  background: #000000;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 60px;
+  justify-content: center;
+}
+
+.outer .notch {
+  position: absolute;
+  width: 162px;
+  height: 32px;
+  left: 130px;
+  top: 20px;
+}
+.outer .notch .camera {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 16px;
+  top: 3px;
+  background: #171718;
+  border-radius: 50%;
+}
+
+.left-subtract {
+  width: 9px;
+  height: 9px;
+  /* background: #000000; */
+  margin-right: -1px;
+  background-image: radial-gradient(
+    circle at left bottom,
+    transparent 9px,
+    #000 9px
+  );
+}
+
+.right-subtract {
+  width: 9px;
+  height: 9px;
+  /* background: #000000; */
+  margin-left: -1px;
+  background-image: radial-gradient(
+    circle at right bottom,
+    transparent 9px,
+    #000 9px
+  );
+}
+
+.center {
+  width: 154px;
+  height: 32px;
+  border-radius: 0 0 16px 16px;
+  background: #000000;
+}
+
+.iframe {
+  display: flex;
+}
+
+.top-signal {
+  position: absolute;
+  width: 8px;
+  height: 6px;
+  left: 326px;
+  top: 0px;
+  background: #c0c0c0;
+  mix-blend-mode: multiply;
+}
+
+.left-signal {
+  position: absolute;
+  width: 6px;
+  height: 8px;
+  left: 0;
+  top: 83px;
+  background: #c0c0c0;
+  mix-blend-mode: multiply;
+}
+.right-top-signal {
+  position: absolute;
+  width: 6px;
+  height: 8px;
+  right: 0;
+  top: 83px;
+  background: #c0c0c0;
+  mix-blend-mode: multiply;
+}
+.right-bottom-signal {
+  position: absolute;
+  width: 6px;
+  height: 8px;
+  right: 0;
+  top: 761px;
+  background: #c0c0c0;
+  mix-blend-mode: multiply;
+}
+
+.speaker {
+  position: absolute;
+  width: 67px;
+  height: 7px;
+  left: 176.61px;
+  top: 8px;
+
+  background: #171718;
+  border-radius: 2.89807px;
+}
+
+.screen {
+  width: 375px;
+  height: 812px;
+  background-color: #fff;
+  border-radius: 42px;
+}

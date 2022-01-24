@@ -1,18 +1,42 @@
-import { defineComponent } from 'vue'
+import { defineComponent, PropType, ref } from 'vue'
 
 import '@/styles/date-picker.css'
 import DateRangePanel from './com/DateRangePanel'
+import Input from 'components/input/index'
+import Picker from './com/Picker'
+import DateTable from './com/DateTable'
+import dayjs, { isDayjs, Dayjs } from 'dayjs'
+import DatePanel from './com/DatePanel'
+import { DEFAULT_FORMATS_DATEPICKER, DEFAULT_FORMATS_DATE } from './constant'
+import { IDatePickerType } from './type'
 
 export default defineComponent({
-  setup() {
+  props: {
+    format: {
+      type: String
+    },
+    type: {
+      type: String as PropType<IDatePickerType>,
+      default: 'date'
+    }
   },
-  render() {
-    return (
+  setup(props) {
+    const value = ref(new Date())
+    const format =
+      props.format ??
+      (DEFAULT_FORMATS_DATEPICKER[props.type] || DEFAULT_FORMATS_DATE)
+    return () => (
       <div>
-        <p>Range</p>
-        <DateRangePanel type="range" />
+        <Picker type="date" v-model={value.value} format={format}>
+          {{
+            default: (scopedProps: Record<string, unknown>) => (
+              <DatePanel type="date" {...{ ...scopedProps }}></DatePanel>
+            )
+          }}
+        </Picker>
+        {/* <DateRangePanel type="range" />
         <p>Week Range</p>
-        <DateRangePanel type="weekrange" />
+        <DateRangePanel type="weekrange" /> */}
       </div>
     )
   }

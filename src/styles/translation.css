@@ -1,0 +1,11 @@
+.fade-in-linear-enter-active,
+.fade-in-linear-leave-active {
+  transform: scale(1, 1);
+  @apply transition duration-200;
+}
+
+.fade-in-linear-enter-from,
+.fade-in-linear-leave-to {
+  transform: scale(0.75, 0.5625);
+  opacity: 0;
+}

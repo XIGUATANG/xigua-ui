@@ -1,0 +1,4 @@
+.xg-popper {
+  transform-origin: 0px 0px;
+  @apply shadow-md rounded-lg bg-white;
+}

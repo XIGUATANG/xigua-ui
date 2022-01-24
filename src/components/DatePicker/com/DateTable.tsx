@@ -1,37 +1,36 @@
-import { defineComponent, PropType, ref, computed } from 'vue'
+import { defineComponent, PropType, ref, computed, inject } from 'vue'
 
-import LeftArrow from '@/components/LeftArrow.vue'
-import RightArrow from '@/components/RightArrow.vue'
 import dayjs, { Dayjs } from 'dayjs'
 
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefroe from 'dayjs/plugin/isSameOrBefore'
+import { WEEKS } from '../constant'
 
 dayjs.extend(isSameOrAfter)
 dayjs.extend(isSameOrBefroe)
 
 interface Cell {
-  isCurrentMonth:boolean;
-  text:string;
-  row: number;
-  column: number;
-  type: string;
-  inRange: boolean;
-  start: boolean;
-  disabled: boolean;
-  end: boolean;
+  isCurrentMonth: boolean
+  text: string
+  row: number
+  column: number
+  type: string
+  inRange: boolean
+  start: boolean
+  disabled: boolean
+  end: boolean
 }
 
-const MONTHS = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
+function onPick(parmas: Dayjs): void
+function onPick(parmas: { minDate: Dayjs | null; maxDate: Dayjs | null }): void
+function onPick() {}
+export type OnPickFunction = typeof onPick
 
-const WEEKS = ['一', '二', '三', '四', '五', '六', '日']
-
-export type OnPickFunction = (parms:{minDate:Dayjs|null; maxDate:Dayjs|null}) =>void
-export type SelectionMode = 'range'|'day'|'week' | 'weekrange'
+export type SelectionMode = 'range' | 'day' | 'week' | 'weekrange'
 
 export interface RangeState {
-  endDate:null|Dayjs;
-  selecting:boolean
+  endDate: null | Dayjs
+  selecting: boolean
 }
 
 export default defineComponent({
@@ -44,6 +43,9 @@ export default defineComponent({
       type: String as PropType<SelectionMode>,
       default: 'range'
     },
+    parsedValue: {
+      type: Object as PropType<Dayjs | Dayjs[]>
+    },
     rangeState: {
       type: Object as PropType<RangeState>,
       default: () => ({
@@ -52,38 +54,54 @@ export default defineComponent({
       })
     },
     minDate: {
-      type: Object as PropType<Dayjs|null>
+      type: Object as PropType<Dayjs | null>
     },
     onChangeRange: {
-      type: Function as PropType<(rangeState:RangeState)=>void>,
+      type: Function as PropType<(rangeState: RangeState) => void>,
       default: () => {}
     },
     maxDate: {
-      type: Object as PropType<Dayjs|null>
+      type: Object as PropType<Dayjs | null>
     },
     onPick: {
       type: Function as PropType<OnPickFunction>,
       default: () => {}
     },
     onSelect: {
-      type: Function as PropType<(selecting:boolean)=>void>,
+      type: Function as PropType<(selecting: boolean) => void>,
       default: () => {}
     }
   },
   setup(props) {
-    const lastRow = ref<number| null>(null)
-    const lastColumn = ref<number| null>(null)
+    const lastRow = ref<number | null>(null)
+    const lastColumn = ref<number | null>(null)
     const startDate = computed(() => {
       const startDayOfMonth = props.date.startOf('month')
       const dayOfStartDayOfMonth = startDayOfMonth.day()
-      return startDayOfMonth.subtract(dayOfStartDayOfMonth === 0 ? 6 : dayOfStartDayOfMonth - 1, 'day')
+      return startDayOfMonth.subtract(
+        dayOfStartDayOfMonth === 0 ? 6 : dayOfStartDayOfMonth - 1,
+        'day'
+      )
     })
+
+    const cellMatchesDate = (cell: Cell, date: Dayjs) => {
+      if (!date) return false
+      return dayjs(date).isSame(props.date.date(Number(cell.text)), 'day')
+    }
+
+    const isCurrent = (cell: Cell): boolean => {
+      return (
+        props.selectionMode === 'day' &&
+        (cell.type === 'normal' || cell.type === 'today') &&
+        cellMatchesDate(cell, props.parsedValue as Dayjs)
+      )
+    }
 
     const monthIndex = computed(() => props.date.month())
     const calNow = dayjs().startOf('day')
-    const getCellClasses = (cell:Cell) => {
-      const classes:string[] = 'cell cell-day w-10 h-10 flex items-center justify-center'.split(' ')
-      if ((cell.type === 'normal' || cell.type === 'today')) {
+    const getCellClasses = (cell: Cell) => {
+      const classes: string[] = 'cell cell-day'.split(' ')
+      if (cell.type === 'normal' || cell.type === 'today') {
         classes.push('cell-day-available')
         if (cell.type === 'today') {
           classes.push('today')
@@ -91,42 +109,54 @@ export default defineComponent({
       } else {
         classes.push(cell.type)
       }
+
       if (!cell.isCurrentMonth) {
         classes.push('cell-not-currentmonth')
       } else {
-        if (cell.start) {
-          classes.push('cell-start')
+        if (props.selectionMode === 'day' && isCurrent(cell)) {
+          classes.push('current')
         }
-        if (cell.end) {
-          classes.push('cell-end')
-        }
-        if (cell.inRange) {
-          classes.push('cell-in-range')
-          const { row, column } = cell
-          if (!rows.value[row - 1]?.[column].inRange || !rows.value[row - 1]?.[column].isCurrentMonth) {
-            column === 0 && classes.push('rounded-tl-lg')
-            column === 6 && classes.push('rounded-tr-lg')
+        if (props.selectionMode !== 'day') {
+          if (cell.start) {
+            classes.push('cell-start')
           }
-          if (!rows.value[row + 1]?.[column]?.inRange || !rows.value[row + 1]?.[column]?.isCurrentMonth) {
-            column === 0 && classes.push('rounded-bl-lg')
-            column === 6 && classes.push('rounded-br-lg')
+          if (cell.end) {
+            classes.push('cell-end')
+          }
+          if (cell.inRange) {
+            classes.push('cell-in-range')
+            const { row, column } = cell
+            if (
+              !rows.value[row - 1]?.[column].inRange ||
+              !rows.value[row - 1]?.[column].isCurrentMonth
+            ) {
+              column === 0 && classes.push('rounded-tl-lg')
+              column === 6 && classes.push('rounded-tr-lg')
+            }
+            if (
+              !rows.value[row + 1]?.[column]?.inRange ||
+              !rows.value[row + 1]?.[column]?.isCurrentMonth
+            ) {
+              column === 0 && classes.push('rounded-bl-lg')
+              column === 6 && classes.push('rounded-br-lg')
+            }
           }
         }
       }
       return classes
     }
 
-    const getDateOfCell = (row:number, column:number) => {
-      const offsetFromStart =
-        row * 7 + column
+    const getDateOfCell = (row: number, column: number) => {
+      const offsetFromStart = row * 7 + column
       return startDate.value.add(offsetFromStart, 'day')
     }
     const rows = computed(() => {
       const monthStart = props.date.startOf('month')
       let calTime = dayjs(monthStart)
-      let calEndDate = props.rangeState.endDate ||
-                         props.maxDate ||
-                        (props.rangeState.selecting && props.minDate)
+      let calEndDate =
+        props.rangeState.endDate ||
+        props.maxDate ||
+        (props.rangeState.selecting && props.minDate)
 
       if (props.maxDate && calEndDate && props.maxDate.isAfter(calEndDate)) {
         calEndDate = props.maxDate
@@ -135,10 +165,15 @@ export default defineComponent({
       while (calTime.day() !== 1) {
         calTime = calTime.add(-1, 'day')
       }
-      const rowsValue:Cell[][] = [[], [], [], [], [], []]
+      const rowsValue: Cell[][] = [[], [], [], [], [], []]
       let minDate = props.minDate
 
-      if (props.selectionMode === 'weekrange' && props.rangeState.endDate && props.minDate && props.rangeState.endDate.isBefore(props.minDate)) {
+      if (
+        props.selectionMode === 'weekrange' &&
+        props.rangeState.endDate &&
+        props.minDate &&
+        props.rangeState.endDate.isBefore(props.minDate)
+      ) {
         minDate = props.rangeState.endDate
       }
       rowsValue.forEach((row, i) => {
@@ -161,12 +196,17 @@ export default defineComponent({
           }
           cell.isCurrentMonth = calTime.month() === props.date.month()
           if (minDate && calEndDate) {
-            cell.inRange = (calTime.isSameOrAfter(minDate, 'day') && calTime.isSameOrBefore(calEndDate, 'day')) ||
-             (calTime.isSameOrAfter(calEndDate, 'day') && calTime.isSameOrBefore(minDate, 'day'))
+            cell.inRange =
+              (calTime.isSameOrAfter(minDate, 'day') &&
+                calTime.isSameOrBefore(calEndDate, 'day')) ||
+              (calTime.isSameOrAfter(calEndDate, 'day') &&
+                calTime.isSameOrBefore(minDate, 'day'))
           }
           if (minDate) {
             if (minDate.isSameOrAfter(calEndDate || null)) {
-              cell.start = calEndDate ? calTime.isSame(calEndDate, 'day') : false
+              cell.start = calEndDate
+                ? calTime.isSame(calEndDate, 'day')
+                : false
               cell.end = calTime.isSame(minDate, 'day')
             } else {
               cell.start = calTime.isSame(minDate, 'day')
@@ -181,30 +221,35 @@ export default defineComponent({
       return rowsValue
     })
 
-    const handleCellClick = (e:MouseEvent) => {
+    const handleCellClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement
       if (target?.tagName !== 'SPAN') {
         return false
       }
-
+      const rowIndex = +target.getAttribute('data-row-index')!
+      const columnIndex = +target.getAttribute('data-column-index')!
+      let cellDate = getDateOfCell(rowIndex, columnIndex)
       if (props.selectionMode === 'range') {
-        const rowIndex = +target.getAttribute('data-row-index')!
-        const columnIndex = +target.getAttribute('data-column-index')!
-        const cellDate = getDateOfCell(rowIndex, columnIndex)
         if (!props.rangeState.selecting) {
           props.onPick({ minDate: cellDate, maxDate: null })
         } else {
-          const [minDate = null, maxDate = null] = [props.minDate, cellDate].sort((a, b) => a!.valueOf() - b!.valueOf())
+          const [minDate = null, maxDate = null] = [
+            props.minDate,
+            cellDate
+          ].sort((a, b) => a!.valueOf() - b!.valueOf())
           props.onPick({ minDate, maxDate })
         }
         props.onSelect(!props.rangeState.selecting)
       } else if (props.selectionMode === 'weekrange') {
-        const rowIndex = +target.getAttribute('data-row-index')!
-        const cellDate = getDateOfCell(rowIndex, 0)
         if (!props.rangeState.selecting) {
-          props.onPick({ minDate: cellDate, maxDate: getDateOfCell(rowIndex, 6) })
+          props.onPick({
+            minDate: cellDate,
+            maxDate: getDateOfCell(rowIndex, 6)
+          })
         } else {
-          let minDate = props.minDate; let maxDate = cellDate
+          let minDate = props.minDate
+          let maxDate = cellDate
+          cellDate = getDateOfCell(rowIndex, 0)
           if (cellDate.isSameOrAfter(props.minDate)) {
             minDate = props.minDate!
             maxDate = cellDate.add(6, 'days')
@@ -216,32 +261,35 @@ export default defineComponent({
           props.onPick({ minDate, maxDate })
         }
         props.onSelect(!props.rangeState.selecting)
+      } else if (props.selectionMode === 'day') {
+        props.onPick(cellDate)
       }
     }
 
-    const handleMouseMove = (e:MouseEvent) => {
+    const handleMouseMove = (e: MouseEvent) => {
       if (!props.rangeState.selecting) return
       const target = e.target as HTMLElement
       if (target?.tagName !== 'SPAN') {
         return false
       }
 
+      const row = +target.getAttribute('data-row-index')!
+      const column = +target.getAttribute('data-column-index')!
+      const cellDate = getDateOfCell(row, column)
       if (props.selectionMode === 'weekrange') {
-        const row = +target.getAttribute('data-row-index')!
         if (row !== lastRow.value) {
           lastRow.value = row
           let cellDate = getDateOfCell(row, 6)
           if (cellDate.isBefore(props.minDate)) {
             cellDate = getDateOfCell(row, 0)
           }
-          props.onChangeRange && props.onChangeRange({
-            selecting: true,
-            endDate: cellDate
-          })
+          props.onChangeRange &&
+            props.onChangeRange({
+              selecting: true,
+              endDate: cellDate
+            })
         }
       } else if (props.selectionMode === 'range') {
-        const row = +target.getAttribute('data-row-index')!
-        const column = +target.getAttribute('data-column-index')!
         // can not select disabled date
         if (rows.value[row][column].disabled) return
         // only update rangeState when mouse moves to a new cell
@@ -249,13 +297,36 @@ export default defineComponent({
         if (row !== lastRow.value || column !== lastColumn.value) {
           lastRow.value = row
           lastColumn.value = column
-          props.onChangeRange && props.onChangeRange({
-            selecting: true,
-            endDate: getDateOfCell(row, column)
-          })
+          props.onChangeRange &&
+            props.onChangeRange({
+              selecting: true,
+              endDate: getDateOfCell(row, column)
+            })
         }
       }
     }
+
+    const tableCalsses = computed(() => {
+      const classes = ['xg-date-table']
+      if (
+        props.selectionMode === 'range' ||
+        props.selectionMode === 'weekrange'
+      ) {
+        classes.push('is-range')
+      }
+      return classes
+    })
+
+    const injectBase = inject('EP_PICKER_BASE') as any
+
+    const { onDateMouseEnter, onDateMouseLeave } = injectBase
+
+    const handleCellEnter = (row: number, column: number) => {
+      const cellDate = getDateOfCell(row, column)
+      onDateMouseEnter(cellDate)
+    }
+
+    const handleCellLeave = onDateMouseLeave
 
     return {
       monthIndex,
@@ -263,34 +334,40 @@ export default defineComponent({
       handleCellClick,
       getCellClasses,
       startDate,
-      handleMouseMove
+      handleMouseMove,
+      tableCalsses,
+      handleCellEnter,
+      handleCellLeave
     }
   },
   render() {
     return (
-      <div class="px-6 pt-5 pb-6">
-        <div class="flex justify-between items-center">
-          <div class="hover:bg-gray-100 rounded-lg cursor-pointer">
-            <LeftArrow />
-          </div>
-          <span>{MONTHS[this.monthIndex]}</span>
-          <div class="hover:bg-gray-100 rounded-lg cursor-pointer">
-            <RightArrow />
-          </div>
-        </div>
+      <div class={this.tableCalsses}>
         <div class="flex font-black">
-          {
-            WEEKS.map(day => <div key={`week${day}`} class="cell w-10 h-10 flex items-center justify-center">{day}</div>)
-          }
+          {WEEKS.map(day => (
+            <div key={`week${day}`} class="cell">
+              {day}
+            </div>
+          ))}
         </div>
-        <div onClick={this.handleCellClick} onMousemove={this.handleMouseMove} >
-          {
-            this.rows.map((row, i) => <div key={`row_${i}`} class="flex cell-text">
-              {
-                row.map((cell, j) => <span data-row-index={i} data-column-index={j} key={`day_${j}`} class={this.getCellClasses(cell)}>{cell.text}</span>)
-              }
-            </div>)
-          }
+        <div onClick={this.handleCellClick} onMousemove={this.handleMouseMove}>
+          {this.rows.map((row, i) => (
+            <div key={`row_${i}`} class="flex cell-text">
+              {row.map((cell, j) => (
+                <span
+                  onMouseenter={() =>
+                    !cell.disabled && this.handleCellEnter(i, j)
+                  }
+                  onMouseleave={() => !cell.disabled && this.handleCellLeave()}
+                  data-row-index={i}
+                  data-column-index={j}
+                  key={`day_${j}`}
+                  class={this.getCellClasses(cell)}>
+                  {cell.text}
+                </span>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
     )

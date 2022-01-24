@@ -1,0 +1,21 @@
+.simplebar-content-wrapper {
+  overflow: hidden scroll;
+  direction: inherit;
+  position: relative;
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  max-height: 100%;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.left-menu-root {
+  width: 280px;
+}
+
+.wrapper-fixed {
+  width: 280px;
+  @apply fixed top-0 left-0 z-50 h-full transition-shadow duration-300 border-r border-gray-200;
+}

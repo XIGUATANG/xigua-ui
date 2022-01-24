@@ -13,11 +13,16 @@ module.exports = {
     ecmaVersion: 2020
   },
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'space-before-function-paren': 0,
-    'func-call-spacing': 0,
+    indent: 'off',
     '@typescript-eslint/no-empty-function': 'off',
+    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'space-before-function-paren': 0,
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
+    'func-call-spacing': 0,
+    '@typescript-eslint/indent': 0,
+    '@typescript-eslint/no-non-null-assertion': 0,
     curly: ['error', 'multi-line']
   }
 }

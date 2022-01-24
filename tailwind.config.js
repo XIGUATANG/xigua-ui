@@ -33,6 +33,7 @@ module.exports = {
       0: '0px',
       0.5: '0.125rem',
       1: '0.25rem',
+      1.25: '0.3125rem',
       1.5: '0.375rem',
       2: '0.5rem',
       2.5: '0.625rem',
@@ -269,6 +270,8 @@ module.exports = {
       ]
     },
     fontSize: {
+      13: ['0.8125rem', { lineHeight: '1.125rem' }],
+      15: ['0.9375rem', { lineHeight: '1.375rem' }],
       xs: ['0.75rem', { lineHeight: '1rem' }],
       sm: ['0.875rem', { lineHeight: '1.25rem' }],
       base: ['1rem', { lineHeight: '1.5rem' }],
@@ -790,6 +793,7 @@ module.exports = {
       '9/12': '75%',
       '10/12': '83.333333%',
       '11/12': '91.666667%',
+      '70':'70rem',
       full: '100%',
       screen: '100vw',
       min: 'min-content',
