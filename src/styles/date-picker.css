@@ -10,6 +10,15 @@
   position: relative;
   @apply w-10 h-10 flex items-center justify-center;
 }
+.cell::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
 
 .cell-not-currentmonth {
   opacity: 0.4;
@@ -71,14 +80,18 @@
   @apply bg-purple-500 rounded-full text-white;
 }
 
+.yaer-table-cell,
 .month-table-cell {
-  @apply w-20  h-10 font-semibold flex items-center justify-center hover:bg-gray-200 cursor-pointer;
+  @apply w-20  h-10 hover:text-purple-500 font-semibold flex items-center justify-center hover:bg-gray-200 cursor-pointer;
   border-radius: 5rem;
 }
+
+.yaer-table-cell.active,
 .month-table-cell.active {
   @apply bg-purple-500 text-white;
 }
 
+.year-table,
 .month-table {
   @apply grid grid-cols-3 text-13 mt-4;
   width: 17.5rem;
@@ -86,5 +99,5 @@
 }
 
 .picker-input-placeholder input {
-  @apply text-gray-200;
+  @apply text-gray-400;
 }

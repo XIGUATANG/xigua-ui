@@ -1,5 +1,5 @@
 import { Size } from '@/types'
-import { defineComponent, computed, PropType } from 'vue'
+import { defineComponent, computed, PropType, ref } from 'vue'
 
 const sizeStyle = {
   large: {
@@ -78,7 +78,7 @@ export default defineComponent({
     const inputStyle = computed(() => {
       const { input } = sizeStyle[props.size]
       const baseStyle =
-        'flex-1 z-10 focus:ring-purple-500 text-gray-500 focus:border-purple-500 block border-gray-300  rounded-md '.split(
+        'flex-1 z-10 focus:ring-purple-500 text-gray-800 focus:border-purple-500 block border-gray-300  rounded-md '.split(
           ' '
         )
       baseStyle.push(...input)

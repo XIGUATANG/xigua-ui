@@ -18,6 +18,7 @@ import type { IDatePickerType, PickerOptions } from '../type'
 
 import { MONTHS } from '../constant'
 import MonthTable from './MonthTable'
+import YearTable from './YearTable'
 
 export default defineComponent({
   name: 'DatePanel',
@@ -50,7 +51,7 @@ export default defineComponent({
     const minDate = ref<Dayjs | null>(dayjs())
     const maxDate = ref<Dayjs | null>(dayjs().add(12, 'days'))
 
-    const leftDate = ref<Dayjs>(dayjs())
+    const innerDate = ref<Dayjs>(dayjs())
     const rightDate = ref<Dayjs>(dayjs().add(1, 'month'))
     const handlePick: OnPickFunction = (
       prams: Dayjs | { minDate: Dayjs | null; maxDate: Dayjs | null }
@@ -73,10 +74,18 @@ export default defineComponent({
     }
 
     const handlePrev = () => {
-      leftDate.value = leftDate.value.add(-1, 'month')
+      if (currentView.value === 'date') {
+        innerDate.value = innerDate.value.add(-1, 'month')
+      } else if (currentView.value === 'year') {
+        yearStartValue.value = yearStartValue.value + 10
+      }
     }
     const handleNext = () => {
-      leftDate.value = leftDate.value.add(1, 'month')
+      if (currentView.value === 'date') {
+        innerDate.value = innerDate.value.add(1, 'month')
+      } else if (currentView.value === 'year') {
+        yearStartValue.value = yearStartValue.value + 10
+      }
     }
 
     const formatToString = (value: Dayjs | Dayjs[]) => {
@@ -112,18 +121,76 @@ export default defineComponent({
 
     const currentView = ref<'month' | 'date' | 'year'>('date')
 
-    const handlePickMonth = (i: number) => {
-      leftDate.value = leftDate.value.set('month', i)
-      currentView.value = 'date'
-    }
-
-    watch(parsedValue, () => {
+    const setDefaultInnerDate = () => {
       const year = (props.parsedValue || dayjs()).year()
       const month = (props.parsedValue || dayjs()).month()
-      if (year !== leftDate.value.year() || month !== leftDate.value.month()) {
-        leftDate.value = dayjs().set('year', year).set('month', month)
+
+      if (
+        year !== innerDate.value.year() ||
+        month !== innerDate.value.month()
+      ) {
+        innerDate.value = dayjs().set('year', year).set('month', month)
+        yearStartValue.value = yearStart()
       }
+    }
+
+    watch(parsedValue, () => setDefaultInnerDate(), { immediate: true })
+
+    const selectionMode = computed(() => {
+      if (['week', 'month', 'year', 'dates'].includes(props.type)) {
+        return props.type
+      }
+      return 'day'
     })
+
+    const getDefaultView = (val: IDatePickerType | 'day') => {
+      if (val === 'month' || val === 'year') {
+        return val
+      }
+      return 'date'
+    }
+    watch(
+      () => props.visible,
+      val => {
+        if (val === false) {
+          currentView.value = getDefaultView(selectionMode.value)
+          setDefaultInnerDate()
+        }
+      }
+    )
+
+    watch(
+      () => selectionMode.value,
+      val => {
+        currentView.value = getDefaultView(val)
+      },
+      { immediate: true }
+    )
+
+    const yearStart = () => {
+      const year = (props.parsedValue || dayjs()).year()
+      return year - (year % 10)
+    }
+
+    const yearStartValue = ref(yearStart())
+
+    const handleYearPick = (year: number) => {
+      if (selectionMode.value === 'year') {
+        props.onPick?.(dayjs().set('year', year).startOf('year'))
+      } else {
+        innerDate.value = innerDate.value.set('year', year)
+        currentView.value = getDefaultView(selectionMode.value)
+      }
+    }
+
+    const handleMonthPick = (i: number) => {
+      if (selectionMode.value === 'month') {
+        props.onPick?.(innerDate.value.set('month', i).startOf('month'))
+      } else {
+        innerDate.value = innerDate.value.set('month', i)
+        currentView.value = getDefaultView(selectionMode.value)
+      }
+    }
 
     return {
       minDate,
@@ -131,14 +198,17 @@ export default defineComponent({
       maxDate,
       onSelect,
       handlePick,
-      leftDate,
+      innerDate,
       rightDate,
       handlePrev,
       handleNext,
       currentView,
-      handlePickMonth
+      handleMonthPick,
+      handleYearPick,
+      yearStartValue
     }
   },
+
   render() {
     return (
       <div class="inline-flex shadow-md rounded-xl divide-x-1 divide-gray-500 pt-5 px-6 pb-6">
@@ -150,14 +220,25 @@ export default defineComponent({
               <LeftArrow />
             </div>
             <div>
-              <span class="hover:bg-gray-100 rounded-lg cursor-pointer inline-flex items-center px-2 h-10">
-                {this.leftDate.year()}
-              </span>
-              <span
-                onClick={() => (this.currentView = 'month')}
-                class="hover:bg-gray-100 rounded-lg cursor-pointer inline-flex items-center px-2 h-10">
-                {MONTHS[this.leftDate.month()]}
-              </span>
+              {this.currentView === 'year' ? (
+                <span class="inline-flex items-center px-2 h-10">{`${
+                  this.yearStartValue
+                } - ${this.yearStartValue + 9}`}</span>
+              ) : (
+                <span
+                  onClick={() => (this.currentView = 'year')}
+                  class="hover:bg-gray-100 rounded-lg cursor-pointer inline-flex items-center px-2 h-10">
+                  {this.innerDate.year()}
+                </span>
+              )}
+
+              {this.currentView === 'date' ? (
+                <span
+                  onClick={() => (this.currentView = 'month')}
+                  class="hover:bg-gray-100 rounded-lg cursor-pointer inline-flex items-center px-2 h-10">
+                  {MONTHS[this.innerDate.month()]}
+                </span>
+              ) : null}
             </div>
 
             <div
@@ -172,14 +253,22 @@ export default defineComponent({
               selectionMode="day"
               parsedValue={this.parsedValue}
               onPick={this.handlePick}
-              date={this.leftDate}
+              date={this.innerDate}
             />
           )}
 
           {this.currentView === 'month' && (
             <MonthTable
-              onPick={this.handlePickMonth}
-              month={this.leftDate.month()}></MonthTable>
+              onPick={this.handleMonthPick}
+              month={this.innerDate.month()}></MonthTable>
+          )}
+          {this.currentView === 'year' && (
+            <YearTable
+              yearStart={this.yearStartValue}
+              year={this.parsedValue?.year()}
+              type={this.type}
+              onPick={this.handleYearPick}
+            />
           )}
         </div>
       </div>

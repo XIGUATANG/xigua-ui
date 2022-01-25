@@ -17,9 +17,8 @@ import { pickerDefaultProps } from './props'
 import isEqual from 'lodash.isequal'
 import { onClickOutside } from '@vueuse/core'
 import { EVENT_CODE } from '@/utils/aria'
-import Input from 'components/Input'
-import { CalendarIcon } from '@heroicons/vue/outline'
-import CalendarSvg from '@/components/Svg/CloseCircle'
+import Input from 'components/Input/index'
+import CalendarSvg from '@/components/Svg/CalendarSvg'
 import type { PickerOptions } from '../type'
 
 // Date object and string
@@ -64,6 +63,7 @@ const formatter = function (date: number | Date, format: string | undefined) {
 
 export default defineComponent({
   props: pickerDefaultProps,
+  name: 'CommonPicker',
   setup(props, ctx) {
     const refPopper = ref<InstanceType<typeof Popper>>()
     const inputRef = ref<HTMLElement | ComponentPublicInstance>()
@@ -170,6 +170,7 @@ export default defineComponent({
       }
     }
     const onPick = (date: any = '', visible = false) => {
+      placeHolderValue.value = ''
       pickerVisible.value = visible
       let result
       if (Array.isArray(date)) {
@@ -289,14 +290,18 @@ export default defineComponent({
         (Array.isArray(props.modelValue) && !props.modelValue.length)
       )
     })
+    let timer: number
     const onMouseEnter = () => {
       if (props.readonly || props.disabled) return
       if (!valueIsEmpty.value && props.clearable) {
+        timer && clearTimeout(timer)
         showClose.value = true
       }
     }
     const onMouseLeave = () => {
-      showClose.value = false
+      timer = setTimeout(() => {
+        showClose.value = false
+      }, 300)
     }
 
     const popperPaneRef = computed(() => {
@@ -536,6 +541,7 @@ export default defineComponent({
               onSelectRange: setSelectionRange,
               onSetPickerOption: onSetPickerOption,
               selectionMode: 'day',
+              visible: pickerVisible.value,
               onCalendarChange: onCalendarChange,
               onMousedown: (e: Event) => e.stopPropagation()
             })
