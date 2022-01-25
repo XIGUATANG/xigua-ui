@@ -1,4 +1,4 @@
-import Popper from '@/components/popper'
+import Popper from 'components/popper'
 import {
   defineComponent,
   renderSlot,
@@ -10,6 +10,7 @@ import {
   provide
 } from 'vue'
 import type { ComponentPublicInstance } from 'vue'
+import LeftArrow from 'components/Svg/LeftArrow'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { isEmpty } from '@/utils/util'
@@ -71,11 +72,8 @@ export default defineComponent({
     const valueOnOpen = ref()
     const userInput = ref()
 
-    const parseUserInput = (value: string | string[]) => {
+    const parseUserInput = (value: string) => {
       if (!value) return null
-      if (Array.isArray(value)) {
-        return value.map(_ => dayjs(_, props.format))
-      }
       return dayjs(value, props.format)
     }
 
@@ -196,6 +194,7 @@ export default defineComponent({
     const handleFocus = (e: FocusEvent) => {
       if (props.readonly || props.disabled || pickerVisible.value) return
       pickerVisible.value = true
+      e.stopPropagation()
       ctx.emit('focus', e)
     }
 
@@ -332,7 +331,6 @@ export default defineComponent({
       ) {
         return
       }
-
       pickerVisible.value = false
     })
 
@@ -445,29 +443,37 @@ export default defineComponent({
       }
     }
 
-    // const handleStartChange = () => {
-    //   const value = parseUserInputToDayjs(userInput.value && userInput.value[0])
-    //   if (value && value.isValid()) {
-    //     userInput.value = [formatDayjsToString(value), displayValue.value[1]]
-    //     const newValue = [value, parsedValue.value && parsedValue.value[1]]
-    //     if (isValidValue(newValue)) {
-    //       emitInput(newValue)
-    //       userInput.value = null
-    //     }
-    //   }
-    // }
+    const handleStartChange = () => {
+      const value = parseUserInputToDayjs(userInput.value && userInput.value[0])
+      if (value && value.isValid()) {
+        userInput.value = [formatDayjsToString(value), displayValue.value[1]]
+        const newValue = [
+          value,
+          parsedValue.value &&
+            Array.isArray(parsedValue.value) &&
+            parsedValue.value[1]
+        ]
+        if (isValidValue(newValue)) {
+          emitInput(newValue)
+          userInput.value = null
+        }
+      }
+    }
 
-    // const handleEndChange = () => {
-    //   const value = parseUserInputToDayjs(userInput.value && userInput.value[1])
-    //   if (value && value.isValid()) {
-    //     userInput.value = [displayValue.value[0], formatDayjsToString(value)]
-    //     const newValue = [parsedValue.value?.[0], value]
-    //     if (isValidValue(newValue)) {
-    //       emitInput(newValue)
-    //       userInput.value = null
-    //     }
-    //   }
-    // }
+    const handleEndChange = () => {
+      const value = parseUserInputToDayjs(userInput.value && userInput.value[1])
+      if (value && value.isValid()) {
+        userInput.value = [displayValue.value[0], formatDayjsToString(value)]
+        const newValue = [
+          Array.isArray(parsedValue.value) && parsedValue.value[0],
+          value
+        ]
+        if (isValidValue(newValue)) {
+          emitInput(newValue)
+          userInput.value = null
+        }
+      }
+    }
     const handleClick = (e: Event) => {
       e.stopImmediatePropagation()
       e.stopPropagation()
@@ -527,10 +533,24 @@ export default defineComponent({
                 </Input>
               )
             }
-            return <div />
+            return (
+              <div
+                ref={inputRef}
+                class={[
+                  'date-range-input-wrapper',
+                  pickerVisible.value ? 'active' : null
+                ]}>
+                <input
+                  autocomplete="off"
+                  onFocus={handleFocus}
+                  disabled={props.disabled}
+                  placeholder={props.startPlaceholder}></input>
+                <LeftArrow class="text-gray-500" />
+                <input onFocus={handleFocus}></input>
+              </div>
+            )
           },
           default: (scopedProps: any) => {
-            console.log(scopedProps)
             return renderSlot(ctx.slots, 'default', {
               ...scopedProps,
               parsedValue: parsedValue.value,

@@ -14,7 +14,7 @@ export declare type IDatePickerType =
   export interface PickerOptions {
     isValidValue: (date: unknown) => boolean
     handleKeydown: (event: KeyboardEvent) => void
-    parseUserInput: (value: string | string[]) => Dayjs | Dayjs[] | null
+    parseUserInput: (value: string) => Dayjs | null
     formatToString: (value: Dayjs | Dayjs[]) => string | string[]
     getRangeAvailableTime: (date: Dayjs | (Dayjs | undefined)[]) => Dayjs
     getDefaultValue: () => Dayjs

@@ -5,8 +5,8 @@ import DateTable, {
   SelectionMode
 } from './DateTable'
 
-import LeftArrow from '@/components/LeftArrow.vue'
-import RightArrow from '@/components/RightArrow.vue'
+import LeftArrow from '@/components/Svg/LeftArrow.vue'
+import RightArrow from '@/components/Svg/RightArrow.vue'
 
 import '@/styles/date-picker.css'
 import dayjs, { Dayjs, isDayjs } from 'dayjs'

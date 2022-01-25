@@ -1,7 +1,7 @@
 import type { ButtonType, Colors, Size } from '@/types/index'
 import { defineComponent, PropType, computed } from 'vue'
 // import type {  } from 'vue'
-import SpinSvg from '@/components/SpinSvg.vue'
+import SpinSvg from 'components/Svg/SpinSvg.vue'
 
 import '@/styles/button.css'
 export default defineComponent({
@@ -30,15 +30,22 @@ export default defineComponent({
   },
   setup(props, { slots }) {
     let buttonTypeStyle = `bg-${props.color}-500 text-white shadow-sm  border-transparent`
-    if (props.type === 'outlined') buttonTypeStyle = `text-${props.color}-500 border-${props.color}-500`
-    if (props.type === 'text') buttonTypeStyle = `text-${props.color}-500 border-transparent`
+    if (props.type === 'outlined') {
+      buttonTypeStyle = `text-${props.color}-500 border-${props.color}-500`
+    }
+    if (props.type === 'text') {
+      buttonTypeStyle = `text-${props.color}-500 border-transparent`
+    }
     if (!props.disabled && !props.loading) {
       if (props.type === 'text' || props.type === 'outlined') {
         buttonTypeStyle += ` hover:bg-${props.color}-500  focus:bg-${props.color}-700 hover:bg-opacity-5  hover:border-opacity-100  focus:bg-opacity-5  focus:border-opacity-100`
-      } else buttonTypeStyle += ` hover:bg-${props.color}-700   focus:ring-${props.color}-500  focus:ring-2 focus:ring-offset-2`
+      } else {
+        buttonTypeStyle += ` hover:bg-${props.color}-700   focus:ring-${props.color}-500  focus:ring-2 focus:ring-offset-2`
+      }
     }
     const disableClass = props.disabled ? 'xg-button-disabled' : ''
-    const loadingTextClass = props.type === 'primary' ? 'text-white' : `text-${props.color}-500`
+    const loadingTextClass =
+      props.type === 'primary' ? 'text-white' : `text-${props.color}-500`
     const loadingClass = props.loading ? 'cursor-not-allowed' : ''
     const spinClass = computed(() => {
       switch (props.size) {
@@ -56,7 +63,11 @@ export default defineComponent({
     return () => (
       <button
         class={`xg-button xg-button-${props.type} ${buttonTypeStyle}    ${disableClass} ${loadingClass} xg-button-${props.size}`}>
-        {props.loading ? <SpinSvg class={`animate-spin ${spinClass.value} ${loadingTextClass}`} /> : null}
+        {props.loading ? (
+          <SpinSvg
+            class={`animate-spin ${spinClass.value} ${loadingTextClass}`}
+          />
+        ) : null}
         {slots.default && slots.default()}
       </button>
     )

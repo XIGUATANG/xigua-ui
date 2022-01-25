@@ -37,6 +37,7 @@ module.exports = {
       .set('utils', resolve('src/utils'))
       .set('types', resolve('src/types'))
       .set('api', resolve('src/api'))
+      .set('hooks', resolve('src/hooks'))
   },
   devServer: {
     port: '8088',

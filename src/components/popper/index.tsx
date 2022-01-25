@@ -6,10 +6,8 @@ import {
   onActivated,
   onMounted,
   renderSlot,
-  toDisplayString,
-  withDirectives
+  toDisplayString
 } from 'vue'
-import ClickOutside from '@/directives/clickoutside'
 import usePopper from './use-poper'
 import defaultProps from './use-poper/defaults'
 import { renderPopper, renderTrigger, renderArrow } from './renderers'
@@ -47,7 +45,6 @@ export default defineComponent({
       class: kls,
       style,
       effect,
-      hide,
       onPopperMouseEnter,
       onPopperMouseLeave,
       onAfterEnter,
@@ -64,7 +61,6 @@ export default defineComponent({
       sameWidth,
       stopPopperMouseEvent
     } = this
-    const isManual = this.isManualMode()
     const arrow = renderArrow(showArrow)
     const popper = renderPopper(
       {
@@ -100,11 +96,7 @@ export default defineComponent({
       ...this.events
     }
 
-    const trigger = isManual
-      ? renderTrigger(_t!, triggerProps)
-      : withDirectives(renderTrigger(_t!, triggerProps)!, [
-          [ClickOutside, hide]
-        ])
+    const trigger = renderTrigger(_t!, triggerProps)
 
     return (
       <>

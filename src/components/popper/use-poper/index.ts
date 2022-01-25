@@ -7,7 +7,7 @@ import {
   isArray,
   isString
 } from '@/utils/util'
-import PopupManager from '@/utils/popup-manager'
+import { PopupManager } from '@/utils/popup-manager'
 import usePopperOptions from './popper-options'
 
 import type {
@@ -54,7 +54,6 @@ export default function (
   let popperInstance: Nullable<PopperInstance> = null
   let showTimer: Nullable<TimeoutHandle> = null
   let hideTimer: Nullable<TimeoutHandle> = null
-  let triggerFocused = false
 
   const isManualMode = () => props.manualMode || props.trigger === 'manual'
 
@@ -105,6 +104,7 @@ export default function (
 
   const show = () => {
     if (isManualMode() || props.disabled) return
+    if (visibility.value) return
     clearTimers()
     if (props.showAfter === 0) {
       _show()
@@ -203,24 +203,11 @@ export default function (
   }
 
   if (!isManualMode()) {
-    const toggleState = () => {
-      if (visibility.value) {
-        hide()
-      } else {
-        show()
-      }
-    }
-
     const popperEventsHandler = (e: Event) => {
       e.stopPropagation()
       switch (e.type) {
         case 'click': {
-          if (triggerFocused) {
-            // reset previous focus event
-            triggerFocused = false
-          } else {
-            toggleState()
-          }
+          show()
           break
         }
         case 'mouseenter': {
@@ -232,13 +219,10 @@ export default function (
           break
         }
         case 'focus': {
-          triggerFocused = true
           show()
           break
         }
         case 'blur': {
-          triggerFocused = false
-
           hide()
           break
         }

@@ -36,8 +36,8 @@
       "types/*": [
         "./src/types/*"
       ],
-      "api/*": [
-        "./src/api/*"
+      "hooks/*": [
+        "./src/hooks/*"
       ],
     },
     "lib": [

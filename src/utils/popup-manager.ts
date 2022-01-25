@@ -1,8 +1,9 @@
-import isServer from './isServer'
+import { getCurrentInstance } from 'vue'
+import { isClient } from '@vueuse/core'
 import { addClass, removeClass, on } from './dom'
 import { EVENT_CODE } from './aria'
-
 import type { Ref } from 'vue'
+
 interface Instance {
   closeOnClickModal: Ref<boolean>
   closeOnPressEscape: Ref<boolean>
@@ -13,9 +14,11 @@ interface Instance {
 
 type StackFrame = { id: string; zIndex: number; modalClass: string }
 
-interface IPopupManager {
+interface PopupManager {
   getInstance: (id: string) => Instance
   zIndex: number
+  globalInitialZIndex: number
+  getInitialZIndex: () => number
   modalDom?: HTMLElement
   modalFade: boolean
   modalStack: StackFrame[]
@@ -43,10 +46,9 @@ const onModalClick = () => {
 }
 
 let hasModal = false
-let zIndex = 2000
 
-const getModal = function (): HTMLElement|null {
-  if (isServer) return null
+const getModal = function (): HTMLElement {
+  if (!isClient) return undefined as any
   let modalDom = PopupManager.modalDom
   if (modalDom) {
     hasModal = true
@@ -62,14 +64,18 @@ const getModal = function (): HTMLElement|null {
   return modalDom
 }
 
-const instances:{
-  [p:string]:any
-} = {}
+const instances:Record<string, any> = {}
 
-const PopupManager: IPopupManager = {
+export const PopupManager: PopupManager = {
   modalFade: true,
   modalDom: undefined,
-  zIndex,
+  globalInitialZIndex: 2000,
+  zIndex: 0,
+
+  getInitialZIndex() {
+    if (!getCurrentInstance()) return this.globalInitialZIndex
+    return this.globalInitialZIndex
+  },
 
   getInstance(id) {
     return instances[id]
@@ -89,7 +95,7 @@ const PopupManager: IPopupManager = {
   },
 
   nextZIndex() {
-    return ++PopupManager.zIndex
+    return this.getInitialZIndex() + ++this.zIndex
   },
 
   modalStack: [],
@@ -105,7 +111,7 @@ const PopupManager: IPopupManager = {
   },
 
   openModal(id, zIndex, dom, modalClass, modalFade) {
-    if (isServer) return
+    if (!isClient) return
     if (!id || zIndex === undefined) return
     this.modalFade = modalFade
 
@@ -119,7 +125,6 @@ const PopupManager: IPopupManager = {
     }
 
     const modalDom = getModal()
-    if (!modalDom) return
 
     addClass(modalDom, 'v-modal')
     if (this.modalFade && !hasModal) {
@@ -151,7 +156,6 @@ const PopupManager: IPopupManager = {
   closeModal(id) {
     const modalStack = this.modalStack
     const modalDom = getModal()
-    if (!modalDom) return
 
     if (modalStack.length > 0) {
       const topItem = modalStack[modalStack.length - 1]
@@ -163,7 +167,7 @@ const PopupManager: IPopupManager = {
 
         modalStack.pop()
         if (modalStack.length > 0) {
-          modalDom.style.zIndex = modalStack[modalStack.length - 1].zIndex + ''
+          modalDom.style.zIndex = `${modalStack[modalStack.length - 1].zIndex}`
         }
       } else {
         for (let i = modalStack.length - 1; i >= 0; i--) {
@@ -193,18 +197,8 @@ const PopupManager: IPopupManager = {
   }
 }
 
-Object.defineProperty(PopupManager, 'zIndex', {
-  configurable: true,
-  get() {
-    return zIndex ?? 2000
-  },
-  set(value) {
-    zIndex = value
-  }
-})
-
 const getTopPopup = function () {
-  if (isServer) return
+  if (!isClient) return
   if (PopupManager.modalStack.length > 0) {
     const topPopup = PopupManager.modalStack[PopupManager.modalStack.length - 1]
     if (!topPopup) return
@@ -214,10 +208,9 @@ const getTopPopup = function () {
   }
 }
 
-if (!isServer) {
+if (isClient) {
   // handle `esc` key when the popup is shown
-  on(window, 'keydown', function (e) {
-    const event = e as KeyboardEvent
+  window.addEventListener('keydown', function (event: KeyboardEvent) {
     if (event.code === EVENT_CODE.esc) {
       const topPopup = getTopPopup()
 
@@ -225,11 +218,9 @@ if (!isServer) {
         topPopup.handleClose
           ? topPopup.handleClose()
           : topPopup.handleAction
-            ? topPopup.handleAction('cancel')
-            : topPopup.close()
+          ? topPopup.handleAction('cancel')
+          : topPopup.close()
       }
     }
   })
 }
-
-export default PopupManager

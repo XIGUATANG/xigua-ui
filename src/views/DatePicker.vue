@@ -7,11 +7,10 @@ export default defineComponent({
     const value1 = ref<Date>(new Date())
     const value2 = ref(new Date())
     const value3 = ref(new Date())
+    const value4 = ref(new Date())
     return () => (
       <div>
-        <DatePicker type="date" v-model={value1.value} />
-        <DatePicker type="year" v-model={value2.value} />
-        <DatePicker type="month" v-model={value3.value} />
+        <DatePicker type="daterange" v-model={value4.value} />
       </div>
     )
   }

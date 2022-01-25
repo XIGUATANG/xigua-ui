@@ -140,7 +140,7 @@ export default {
   },
   transition: {
     type: String,
-    default: 'fade-in-linear'
+    default: 'fade-in-scale-up'
   },
   trigger: {
     type: [String, Array] as PropType<Trigger>,

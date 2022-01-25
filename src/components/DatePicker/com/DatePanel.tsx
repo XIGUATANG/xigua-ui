@@ -9,8 +9,8 @@ import {
 } from 'vue'
 import DateTable, { OnPickFunction, RangeState } from './DateTable'
 
-import LeftArrow from '@/components/LeftArrow.vue'
-import RightArrow from '@/components/RightArrow.vue'
+import LeftArrow from 'components/Svg/Left.vue'
+import RightArrow from 'components/Svg/Right.vue'
 
 import '@/styles/date-picker.css'
 import dayjs, { Dayjs, isDayjs } from 'dayjs'

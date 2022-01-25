@@ -9,3 +9,27 @@
   transform: scale(0.75, 0.5625);
   opacity: 0;
 }
+
+.fade-in-scale-up-leave-active {
+  transform-origin: inherit;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 1, 1),
+    transform 0.2s cubic-bezier(0.4, 0, 1, 1);
+}
+
+.fade-in-scale-up-enter-active {
+  transform-origin: inherit;
+  transition: opacity 0.2s cubic-bezier(0, 0, 0.8, 1),
+    transform 0.2s cubic-bezier(0, 0, 0.8, 1);
+}
+
+.fade-in-scale-up-enter-from,
+.fade-in-scale-up-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.fade-in-scale-up-leave-from,
+.fade-in-scale-up-transition-enter-to {
+  opacity: 1;
+  transform: scale(1);
+}
