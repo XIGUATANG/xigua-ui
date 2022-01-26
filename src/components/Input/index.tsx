@@ -111,7 +111,7 @@ export default defineComponent({
 
     // #f9fafb
     return () => (
-      <div class="mt-1 relative rounded-md shadow-sm flex">
+      <div class="relative rounded-md shadow-sm flex">
         {slots.prepend ? (
           <div class={pendStyle.value.left}>{slots.prepend()}</div>
         ) : null}

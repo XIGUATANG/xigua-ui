@@ -1,6 +1,7 @@
 import { Size } from '@/types'
 import type { PropType, Component } from 'vue'
 import type { Options } from '@popperjs/core'
+import { IDatePickerType } from '../type'
 export const pickerDefaultProps = {
   id: {
     type: [Array, String]
@@ -21,7 +22,7 @@ export const pickerDefaultProps = {
     default: ''
   },
   type: {
-    type: String,
+    type: String as PropType<IDatePickerType>,
     default: ''
   },
   clearable: {

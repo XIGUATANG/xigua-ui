@@ -103,7 +103,7 @@
 }
 
 .date-range-input-wrapper {
-  @apply flex-1 z-10 text-gray-800 border border-gray-300 rounded-md h-9 text-sm pl-3 pr-3 flex items-center justify-between;
+  @apply flex-1 z-10 text-gray-800 border border-gray-300 rounded-md h-9 text-sm pr-3 flex items-center justify-between;
 }
 
 .date-range-input-wrapper.active {

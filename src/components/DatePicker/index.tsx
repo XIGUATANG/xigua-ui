@@ -11,6 +11,14 @@ import { DEFAULT_FORMATS_DATEPICKER, DEFAULT_FORMATS_DATE } from './constant'
 import { IDatePickerType } from './type'
 import { datePickDefaultProps } from './com/props'
 
+const DATE_RANGE_TYPES = ['daterange', 'weekrange']
+
+const getPanel = (type: IDatePickerType) => {
+  if (DATE_RANGE_TYPES.includes(type)) {
+    return DateRangePanel
+  } else return DatePanel
+}
+
 export default defineComponent({
   name: 'DatePicker',
   props: {
@@ -38,9 +46,10 @@ export default defineComponent({
               emit('update:modelValue', value)
           }}>
           {{
-            default: (scopedProps: Record<string, unknown>) => (
-              <DatePanel type={props.type} {...{ ...scopedProps }}></DatePanel>
-            )
+            default: (scopedProps: Record<string, unknown>) => {
+              const Panel = getPanel(props.type)
+              return <Panel type={props.type} {...{ ...scopedProps }} />
+            }
           }}
         </Picker>
         {/* <DateRangePanel type="range" />

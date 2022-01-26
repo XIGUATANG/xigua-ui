@@ -52,7 +52,6 @@ export default defineComponent({
     const maxDate = ref<Dayjs | null>(dayjs().add(12, 'days'))
 
     const innerDate = ref<Dayjs>(dayjs())
-    const rightDate = ref<Dayjs>(dayjs().add(1, 'month'))
     const handlePick: OnPickFunction = (
       prams: Dayjs | { minDate: Dayjs | null; maxDate: Dayjs | null }
     ) => {
@@ -199,7 +198,6 @@ export default defineComponent({
       onSelect,
       handlePick,
       innerDate,
-      rightDate,
       handlePrev,
       handleNext,
       currentView,

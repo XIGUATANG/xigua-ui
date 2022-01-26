@@ -21,6 +21,7 @@ import { EVENT_CODE } from '@/utils/aria'
 import Input from 'components/Input/index'
 import CalendarSvg from '@/components/Svg/CalendarSvg'
 import type { PickerOptions } from '../type'
+import { formatToString } from '../type'
 
 // Date object and string
 const dateEquals = function (a: Date | any, b: Date | any) {
@@ -79,6 +80,7 @@ export default defineComponent({
 
     const pickerOptions = ref<Partial<PickerOptions>>({
       parseUserInput,
+      formatToString,
       panelReady: true
     })
 
@@ -88,7 +90,7 @@ export default defineComponent({
       }
     }
 
-    const dateLeave = (day: Dayjs) => {
+    const dateLeave = () => {
       placeHolderValue.value = ''
     }
 
@@ -136,9 +138,7 @@ export default defineComponent({
       if (!valueEquals(props.modelValue, val)) {
         let formatValue
         if (Array.isArray(val)) {
-          formatValue = val.map(
-            _ => props.valueFormat && formatter(_, props.valueFormat)
-          )
+          formatValue = val.map(_ => formatter(_, props.valueFormat))
         } else if (val) {
           formatValue = formatter(val, props.valueFormat)
         }
@@ -220,7 +220,6 @@ export default defineComponent({
           result = parser(props.modelValue, props.valueFormat)
         }
       }
-
       if (pickerOptions.value.getRangeAvailableTime && result) {
         const availableResult =
           pickerOptions.value.getRangeAvailableTime(result)
@@ -250,6 +249,12 @@ export default defineComponent({
           userInput.value[1] || (formattedValue && formattedValue[1]) || ''
         ]
       } else if (placeHolderValue.value) {
+        if (Array.isArray(placeHolderValue.value)) {
+          return [
+            placeHolderValue.value[0] || '',
+            placeHolderValue.value[1] || ''
+          ]
+        }
         return placeHolderValue.value
       } else if (userInput.value != null) {
         return userInput.value
@@ -360,7 +365,7 @@ export default defineComponent({
 
     const formatDayjsToString = (value: Dayjs | Dayjs[] | undefined) => {
       if (!value) return null
-      return pickerOptions.value.formatToString?.(value)
+      return pickerOptions.value.formatToString?.(value, props.format || '')
     }
 
     const isValidValue = (value: Dayjs | unknown) => {
@@ -425,7 +430,7 @@ export default defineComponent({
       userInput.value = value
     }
 
-    const handleStartInput = (event: InputEvent) => {
+    const handleStartInput = (event: Event) => {
       const target = event.target as HTMLInputElement
       if (userInput.value) {
         userInput.value = [target.value!, userInput.value[1]]
@@ -434,7 +439,7 @@ export default defineComponent({
       }
     }
 
-    const handleEndInput = (event: InputEvent) => {
+    const handleEndInput = (event: Event) => {
       const target = event.target as HTMLInputElement
       if (userInput.value) {
         userInput.value = [userInput.value[0], target.value]
@@ -540,13 +545,27 @@ export default defineComponent({
                   'date-range-input-wrapper',
                   pickerVisible.value ? 'active' : null
                 ]}>
+                <div class="w-8 flex items-center justify-center">
+                  <CalendarSvg class="w-4 h-4 text-gray-500" />
+                </div>
+
                 <input
                   autocomplete="off"
                   onFocus={handleFocus}
+                  value={displayValue.value?.[0] ?? ''}
                   disabled={props.disabled}
+                  onInput={handleStartInput}
+                  onChange={handleStartChange}
                   placeholder={props.startPlaceholder}></input>
                 <LeftArrow class="text-gray-500" />
-                <input onFocus={handleFocus}></input>
+                <input
+                  onFocus={handleFocus}
+                  disabled={props.disabled}
+                  autocomplete="off"
+                  onInput={handleEndInput}
+                  onChange={handleEndChange}
+                  value={displayValue.value?.[1] ?? ''}
+                  placeholder={props.endPlaceholder}></input>
               </div>
             )
           },
