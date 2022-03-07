@@ -2,9 +2,12 @@
 const colors = require('tailwindcss/colors')
 
 module.exports = {
-  purge: { content: ['./public/**/*.html', './src/**/*.vue'] },
+  content: [
+    // Example content paths...
+    './public/**/*.html',
+    './src/**/*.{js,jsx,ts,tsx,vue}',
+  ],
   presets: [],
-  darkMode: false, // or 'media' or 'class'
   theme: {
     screens: {
       sm: '640px',
@@ -18,14 +21,14 @@ module.exports = {
       current: 'currentColor',
       black: colors.black,
       white: colors.white,
-      gray: colors.coolGray,
+      gray: colors.gray,
       red: colors.red,
       yellow: colors.amber,
       green: colors.emerald,
       blue: colors.blue,
-      sky:colors.sky,
+      sky: colors.sky,
       indigo: colors.indigo,
-      purple: colors.violet,
+      violet: colors.violet,
       pink: colors.pink
     },
     spacing: {
@@ -73,28 +76,31 @@ module.exports = {
       pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       bounce: 'bounce 1s infinite'
     },
-    backdropBlur: (theme) => theme('blur'),
-    backdropBrightness: (theme) => theme('brightness'),
-    backdropContrast: (theme) => theme('contrast'),
-    backdropGrayscale: (theme) => theme('grayscale'),
-    backdropHueRotate: (theme) => theme('hueRotate'),
-    backdropInvert: (theme) => theme('invert'),
-    backdropOpacity: (theme) => theme('opacity'),
-    backdropSaturate: (theme) => theme('saturate'),
-    backdropSepia: (theme) => theme('sepia'),
-    backgroundColor: (theme) => theme('colors'),
+    backdropBlur: theme => theme('blur'),
+    backdropBrightness: theme => theme('brightness'),
+    backdropContrast: theme => theme('contrast'),
+    backdropGrayscale: theme => theme('grayscale'),
+    backdropHueRotate: theme => theme('hueRotate'),
+    backdropInvert: theme => theme('invert'),
+    backdropOpacity: theme => theme('opacity'),
+    backdropSaturate: theme => theme('saturate'),
+    backdropSepia: theme => theme('sepia'),
+    backgroundColor: theme => theme('colors'),
     backgroundImage: {
       none: 'none',
       'gradient-to-t': 'linear-gradient(to top, var(--tw-gradient-stops))',
-      'gradient-to-tr': 'linear-gradient(to top right, var(--tw-gradient-stops))',
+      'gradient-to-tr':
+        'linear-gradient(to top right, var(--tw-gradient-stops))',
       'gradient-to-r': 'linear-gradient(to right, var(--tw-gradient-stops))',
-      'gradient-to-br': 'linear-gradient(to bottom right, var(--tw-gradient-stops))',
+      'gradient-to-br':
+        'linear-gradient(to bottom right, var(--tw-gradient-stops))',
       'gradient-to-b': 'linear-gradient(to bottom, var(--tw-gradient-stops))',
-      'gradient-to-bl': 'linear-gradient(to bottom left, var(--tw-gradient-stops))',
+      'gradient-to-bl':
+        'linear-gradient(to bottom left, var(--tw-gradient-stops))',
       'gradient-to-l': 'linear-gradient(to left, var(--tw-gradient-stops))',
       'gradient-to-tl': 'linear-gradient(to top left, var(--tw-gradient-stops))'
     },
-    backgroundOpacity: (theme) => theme('opacity'),
+    backgroundOpacity: theme => theme('opacity'),
     backgroundPosition: {
       bottom: 'bottom',
       center: 'center',
@@ -135,11 +141,11 @@ module.exports = {
       150: '1.5',
       200: '2'
     },
-    borderColor: (theme) => ({
+    borderColor: theme => ({
       ...theme('colors'),
       DEFAULT: theme('colors.gray.200', 'currentColor')
     }),
-    borderOpacity: (theme) => theme('opacity'),
+    borderOpacity: theme => theme('opacity'),
     borderRadius: {
       none: '0px',
       sm: '0.125rem',
@@ -160,7 +166,8 @@ module.exports = {
     },
     boxShadow: {
       sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-      DEFAULT: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+      DEFAULT:
+        '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
       md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
       lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
       xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
@@ -168,7 +175,7 @@ module.exports = {
       inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
       none: 'none'
     },
-    caretColor: (theme) => theme('colors'),
+    caretColor: theme => theme('colors'),
     contrast: {
       0: '0',
       50: '.5',
@@ -192,12 +199,15 @@ module.exports = {
       help: 'help',
       'not-allowed': 'not-allowed'
     },
-    divideColor: (theme) => theme('borderColor'),
-    divideOpacity: (theme) => theme('borderOpacity'),
-    divideWidth: (theme) => theme('borderWidth'),
+    divideColor: theme => theme('borderColor'),
+    divideOpacity: theme => theme('borderOpacity'),
+    divideWidth: theme => theme('borderWidth'),
     dropShadow: {
       sm: '0 1px 1px rgba(0,0,0,0.05)',
-      DEFAULT: ['0 1px 2px rgba(0, 0, 0, 0.1)', '0 1px 1px rgba(0, 0, 0, 0.06)'],
+      DEFAULT: [
+        '0 1px 2px rgba(0, 0, 0, 0.1)',
+        '0 1px 1px rgba(0, 0, 0, 0.06)'
+      ],
       md: ['0 4px 3px rgba(0, 0, 0, 0.07)', '0 2px 2px rgba(0, 0, 0, 0.06)'],
       lg: ['0 10px 8px rgba(0, 0, 0, 0.04)', '0 4px 3px rgba(0, 0, 0, 0.1)'],
       xl: ['0 20px 13px rgba(0, 0, 0, 0.03)', '0 8px 5px rgba(0, 0, 0, 0.08)'],
@@ -257,7 +267,14 @@ module.exports = {
         '"Segoe UI Symbol"',
         '"Noto Color Emoji"'
       ],
-      serif: ['ui-serif', 'Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
+      serif: [
+        'ui-serif',
+        'Georgia',
+        'Cambria',
+        '"Times New Roman"',
+        'Times',
+        'serif'
+      ],
       mono: [
         'ui-monospace',
         'SFMono-Regular',
@@ -297,8 +314,8 @@ module.exports = {
       extrabold: '800',
       black: '900'
     },
-    gap: (theme) => theme('spacing'),
-    gradientColorStops: (theme) => theme('colors'),
+    gap: theme => theme('spacing'),
+    gradientColorStops: theme => theme('colors'),
     gridAutoColumns: {
       auto: 'auto',
       min: 'min-content',
@@ -413,7 +430,7 @@ module.exports = {
       5: 'repeat(5, minmax(0, 1fr))',
       6: 'repeat(6, minmax(0, 1fr))'
     },
-    height: (theme) => ({
+    height: theme => ({
       auto: 'auto',
       ...theme('spacing'),
       '1/2': '50%',
@@ -431,6 +448,7 @@ module.exports = {
       '3/6': '50%',
       '4/6': '66.666667%',
       '5/6': '83.333333%',
+      '280px': '280px',
       full: '100%',
       screen: '100vh'
     }),
@@ -515,7 +533,7 @@ module.exports = {
       ...theme('spacing'),
       ...negative(theme('spacing'))
     }),
-    maxHeight: (theme) => ({
+    maxHeight: theme => ({
       ...theme('spacing'),
       full: '100%',
       screen: '100vh'
@@ -601,14 +619,14 @@ module.exports = {
       white: ['2px dotted white', '2px'],
       black: ['2px dotted black', '2px']
     },
-    padding: (theme) => theme('spacing'),
-    placeholderColor: (theme) => theme('colors'),
-    placeholderOpacity: (theme) => theme('opacity'),
-    ringColor: (theme) => ({
+    padding: theme => theme('spacing'),
+    placeholderColor: theme => theme('colors'),
+    placeholderOpacity: theme => theme('opacity'),
+    ringColor: theme => ({
       DEFAULT: theme('colors.blue.500', '#3b82f6'),
       ...theme('colors')
     }),
-    ringOffsetColor: (theme) => theme('colors'),
+    ringOffsetColor: theme => theme('colors'),
     ringOffsetWidth: {
       0: '0px',
       1: '1px',
@@ -616,7 +634,7 @@ module.exports = {
       4: '4px',
       8: '8px'
     },
-    ringOpacity: (theme) => ({
+    ringOpacity: theme => ({
       DEFAULT: '0.5',
       ...theme('opacity')
     }),
@@ -695,8 +713,8 @@ module.exports = {
       1: '1',
       2: '2'
     },
-    textColor: (theme) => theme('colors'),
-    textOpacity: (theme) => theme('opacity'),
+    textColor: theme => theme('colors'),
+    textOpacity: theme => theme('opacity'),
     transformOrigin: {
       center: 'center',
       top: 'top',
@@ -764,7 +782,7 @@ module.exports = {
       '-3/4': '-75%',
       '-full': '-100%'
     }),
-    width: (theme) => ({
+    width: theme => ({
       auto: 'auto',
       ...theme('spacing'),
       '1/2': '50%',
@@ -793,7 +811,9 @@ module.exports = {
       '9/12': '75%',
       '10/12': '83.333333%',
       '11/12': '91.666667%',
-      '70':'70rem',
+      70: '70rem',
+      '280px': '280px',
+      '82':'20.5rem',
       full: '100%',
       screen: '100vw',
       min: 'min-content',
@@ -847,17 +867,45 @@ module.exports = {
     backgroundAttachment: ['responsive'],
     backgroundBlendMode: ['responsive'],
     backgroundClip: ['responsive'],
-    backgroundColor: ['responsive', 'dark', 'group-hover', 'focus-within', 'hover', 'focus'],
+    backgroundColor: [
+      'responsive',
+      'dark',
+      'group-hover',
+      'focus-within',
+      'hover',
+      'focus'
+    ],
     backgroundImage: ['responsive'],
-    backgroundOpacity: ['responsive', 'dark', 'group-hover', 'focus-within', 'hover', 'focus'],
+    backgroundOpacity: [
+      'responsive',
+      'dark',
+      'group-hover',
+      'focus-within',
+      'hover',
+      'focus'
+    ],
     backgroundPosition: ['responsive'],
     backgroundRepeat: ['responsive'],
     backgroundSize: ['responsive'],
     backgroundOrigin: ['responsive'],
     blur: ['responsive'],
     borderCollapse: ['responsive'],
-    borderColor: ['responsive', 'dark', 'group-hover', 'focus-within', 'hover', 'focus'],
-    borderOpacity: ['responsive', 'dark', 'group-hover', 'focus-within', 'hover', 'focus'],
+    borderColor: [
+      'responsive',
+      'dark',
+      'group-hover',
+      'focus-within',
+      'hover',
+      'focus'
+    ],
+    borderOpacity: [
+      'responsive',
+      'dark',
+      'group-hover',
+      'focus-within',
+      'hover',
+      'focus'
+    ],
     borderRadius: ['responsive'],
     borderStyle: ['responsive'],
     borderWidth: ['responsive'],
@@ -952,9 +1000,29 @@ module.exports = {
     strokeWidth: ['responsive'],
     tableLayout: ['responsive'],
     textAlign: ['responsive'],
-    textColor: ['responsive', 'dark', 'group-hover', 'focus-within', 'hover', 'focus'],
-    textDecoration: ['responsive', 'group-hover', 'focus-within', 'hover', 'focus'],
-    textOpacity: ['responsive', 'dark', 'group-hover', 'focus-within', 'hover', 'focus'],
+    textColor: [
+      'responsive',
+      'dark',
+      'group-hover',
+      'focus-within',
+      'hover',
+      'focus'
+    ],
+    textDecoration: [
+      'responsive',
+      'group-hover',
+      'focus-within',
+      'hover',
+      'focus'
+    ],
+    textOpacity: [
+      'responsive',
+      'dark',
+      'group-hover',
+      'focus-within',
+      'hover',
+      'focus'
+    ],
     textOverflow: ['responsive'],
     textTransform: ['responsive'],
     transform: ['responsive'],

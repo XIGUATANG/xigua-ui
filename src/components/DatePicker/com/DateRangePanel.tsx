@@ -86,7 +86,8 @@ export default defineComponent({
       return emitDayjs
     }
     const handlePick = (
-      prams: Dayjs | { minDate: Dayjs | null; maxDate: Dayjs | null }
+      prams: Dayjs | { minDate: Dayjs | null; maxDate: Dayjs | null },
+      visible = false
     ) => {
       if (isDayjs(prams)) return
       const min_ = prams.minDate
@@ -101,7 +102,10 @@ export default defineComponent({
       maxDate.value = maxDate_
       minDate.value = minDate_
 
-      handleConfirm()
+      if (!visible) {
+        handleConfirm()
+      }
+
       // props.onPick?.([_min!, _max!])
     }
 
@@ -156,9 +160,44 @@ export default defineComponent({
       }
     )
 
+    const handleLeftMonthPrev = () => {
+      leftInnerDate.value = leftInnerDate.value.add(-1, 'month')
+      if (!pickerBase.props.unlinkPanels) {
+        rightInnerDate.value = leftInnerDate.value.add(1, 'month')
+      }
+    }
+
+    const handleLeftMonthNext = () => {
+      if (middleToogleDisabled.value) return
+      leftInnerDate.value = leftInnerDate.value.add(1, 'month')
+      if (!pickerBase.props.unlinkPanels) {
+        rightInnerDate.value = leftInnerDate.value.add(1, 'month')
+      }
+    }
+
+    const handleRightMonthPrev = () => {
+      if (middleToogleDisabled.value) return
+      rightInnerDate.value = rightInnerDate.value.add(-1, 'month')
+      if (!pickerBase.props.unlinkPanels) {
+        leftInnerDate.value = leftInnerDate.value.add(1, 'month')
+      }
+    }
+
+    const handleRightMonthNext = () => {
+      rightInnerDate.value = rightInnerDate.value.add(1, 'month')
+      if (!pickerBase.props.unlinkPanels) {
+        leftInnerDate.value = leftInnerDate.value.add(1, 'month')
+      }
+    }
+
     const handleChangeRange = (val: RangeState) => {
       rangeState.value = val
     }
+
+    const middleToogleDisabled = computed(() => {
+      if (!pickerBase.props.unlinkPanels) return false
+      return leftInnerDate.value.add(1, 'month').isSameOrAfter(rightInnerDate.value, 'month')
+    })
     return {
       minDate,
       rangeState,
@@ -168,15 +207,20 @@ export default defineComponent({
       handleChangeRange,
       leftInnerDate,
       rightInnerDate,
-      selectionMode
+      selectionMode,
+      handleLeftMonthPrev,
+      handleLeftMonthNext,
+      middleToogleDisabled,
+      handleRightMonthPrev,
+      handleRightMonthNext
     }
   },
   render() {
     return (
       <div class="grid grid-cols-2 divide-x divide-inherit shadow-md rounded-xl">
-        <div class="px-6 py-5">
+        <div class="px-6 py-5 w-82">
           <div class="flex justify-between items-center text-sm">
-            <div class="hover:bg-gray-100 rounded-lg cursor-pointer">
+            <div onClick={this.handleLeftMonthPrev} class="hover:bg-gray-100 rounded-lg cursor-pointer">
               <LeftArrow />
             </div>
             <div>
@@ -187,8 +231,7 @@ export default defineComponent({
                 {MONTHS[this.leftInnerDate.month()]}
               </span>
             </div>
-
-            <div class="hover:bg-gray-100 rounded-lg cursor-pointer">
+            <div onClick={this.handleLeftMonthNext} class={`rounded-lg ${this.middleToogleDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100  cursor-pointer'}`}>
               <RightArrow />
             </div>
           </div>
@@ -205,7 +248,7 @@ export default defineComponent({
         </div>
         <div class="px-6 py-5">
           <div class="flex justify-between items-center  text-sm">
-            <div class="hover:bg-gray-100 rounded-lg cursor-pointer">
+            <div onClick={this.handleRightMonthPrev} class={`rounded-lg ${this.middleToogleDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100  cursor-pointer'}`}>
               <LeftArrow />
             </div>
             <div class="h-full">
@@ -217,7 +260,7 @@ export default defineComponent({
               </span>
             </div>
 
-            <div class="hover:bg-gray-100 rounded-lg cursor-pointer">
+            <div onClick={this.handleRightMonthNext} class="hover:bg-gray-100 rounded-lg cursor-pointer">
               <RightArrow />
             </div>
           </div>

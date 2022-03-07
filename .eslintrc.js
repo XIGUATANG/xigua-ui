@@ -23,6 +23,7 @@ module.exports = {
     'func-call-spacing': 0,
     '@typescript-eslint/indent': 0,
     '@typescript-eslint/no-non-null-assertion': 0,
-    curly: ['error', 'multi-line']
+    curly: ['error', 'multi-line'],
+    eqeqeq: ['error', 'always', { null: 'ignore' }]
   }
 }

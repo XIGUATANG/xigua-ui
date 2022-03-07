@@ -2,11 +2,11 @@ export type Size = 'mini' | 'small' | 'medium' | 'large'
 export type Colors =
   | 'gray'
   | 'red'
-  | 'yelllow'
+  | 'yellow'
   | 'green'
   | 'blue'
   | 'indigo'
-  | 'purple'
+  | 'violet'
   | 'pink'
 
 export type ButtonType = 'primary' | 'outlined' | 'text'

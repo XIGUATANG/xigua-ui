@@ -93,8 +93,8 @@ export default defineComponent({
     const dateLeave = () => {
       placeHolderValue.value = ''
     }
-
     provide('EP_PICKER_BASE', {
+
       props,
       onDateMouseEnter: dateEnter,
       onDateMouseLeave: dateLeave

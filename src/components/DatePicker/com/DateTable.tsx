@@ -1,10 +1,22 @@
 import { defineComponent, PropType, ref, computed, inject } from 'vue'
+import advancedFormat from 'dayjs/plugin/advancedFormat'
+import updateLocale from 'dayjs/plugin/updateLocale'
+import weekYear from 'dayjs/plugin/weekYear'
+import weekOfYear from 'dayjs/plugin/weekOfYear'
+
+import 'dayjs/locale/zh-cn'
 
 import dayjs, { Dayjs } from 'dayjs'
 
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefroe from 'dayjs/plugin/isSameOrBefore'
 import { WEEKS } from '../constant'
+dayjs.extend(weekYear)
+dayjs.extend(weekOfYear)
+dayjs.extend(updateLocale)
+dayjs.extend(advancedFormat) // 导入本地化语言
+
+dayjs.locale('zh-cn')
 
 dayjs.extend(isSameOrAfter)
 dayjs.extend(isSameOrBefroe)
@@ -22,7 +34,7 @@ interface Cell {
 }
 
 function onPick(parmas: Dayjs): void
-function onPick(parmas: { minDate: Dayjs | null; maxDate: Dayjs | null }): void
+function onPick(parmas: { minDate: Dayjs | null; maxDate: Dayjs | null }, visible?:boolean): void
 function onPick() {}
 export type OnPickFunction = typeof onPick
 
@@ -243,9 +255,9 @@ export default defineComponent({
       } else if (props.selectionMode === 'weekrange') {
         if (!props.rangeState.selecting) {
           props.onPick({
-            minDate: cellDate,
+            minDate: getDateOfCell(rowIndex, 0),
             maxDate: getDateOfCell(rowIndex, 6)
-          })
+          }, true)
         } else {
           let minDate = props.minDate
           let maxDate = cellDate
@@ -314,6 +326,9 @@ export default defineComponent({
       ) {
         classes.push('is-range')
       }
+      if (props.selectionMode === 'week' || props.selectionMode === 'weekrange') {
+        classes.push('is-week')
+      }
       return classes
     })
 
@@ -352,7 +367,7 @@ export default defineComponent({
         </div>
         <div onClick={this.handleCellClick} onMousemove={this.handleMouseMove}>
           {this.rows.map((row, i) => (
-            <div key={`row_${i}`} class="flex cell-text">
+            <div key={`row_${i}`} class="flex cell-text date-row">
               {row.map((cell, j) => (
                 <span
                   onMouseenter={() =>

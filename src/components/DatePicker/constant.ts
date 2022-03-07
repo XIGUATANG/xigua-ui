@@ -4,8 +4,8 @@ export const DEFAULT_FORMATS_DATE = 'YYYY-MM-DD'
 export const DEFAULT_FORMATS_DATEPICKER = {
   date: DEFAULT_FORMATS_DATE,
   dates: DEFAULT_FORMATS_DATE,
-  week: 'gggg[w]ww',
-  weekrange: 'gggg[w]ww',
+  week: 'gggg-ww周',
+  weekrange: 'gggg-ww周',
   year: 'YYYY',
   month: 'YYYY-MM',
   datetime: `${DEFAULT_FORMATS_DATE} ${DEFAULT_FORMATS_TIME}`,
