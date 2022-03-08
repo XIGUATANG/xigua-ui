@@ -9,6 +9,7 @@
 .cell {
   position: relative;
   @apply w-10 h-10 flex items-center justify-center;
+
 }
 .cell::after {
   content: '';
@@ -29,21 +30,29 @@
   @apply hover:bg-gray-200 rounded-lg;
 }
 
-.cell-day-available:not(.cell-in-range):not(.cell-start):not(.current) {
-  @apply hover:bg-gray-200 rounded-full hover:text-violet-500;
+.xg-date-table:not(.is-week) .cell-day-available:not(.cell-in-range):not(.cell-start):not(.current) {
+  @apply hover:bg-gray-200 hover:text-violet-500 rounded-full;
 }
 
 .cell-day-available {
   cursor: pointer;
 }
 
-.cell-day.today:not(.cell-in-range):not(.current) {
+.date-row:not(.current-week)  .cell-day.today:not(.cell-in-range):not(.current) {
   @apply bg-gray-200 font-semibold;
 }
 
-.is-week .date-row:hover {
+.is-week .date-row:not(.current-week):hover {
   @apply bg-gray-200 rounded-lg;
 }
+
+.is-week .date-row.current-week {
+  @apply bg-violet-500 rounded-lg;
+}
+.is-week .date-row.current-week .cell{
+  @apply text-white font-semibold
+}
+
 .cell-day.today::before {
   content: '';
   display: block;
@@ -91,13 +100,13 @@
 
 .yaer-table-cell,
 .month-table-cell {
-  @apply w-20  h-10 hover:text-violet-500 font-semibold flex items-center justify-center hover:bg-gray-200 cursor-pointer;
+  @apply w-20  h-10 hover:text-violet-500 hover:font-semibold flex items-center justify-center hover:bg-gray-200 cursor-pointer;
   border-radius: 5rem;
 }
 
 .yaer-table-cell.active,
 .month-table-cell.active {
-  @apply bg-violet-500 text-white;
+  @apply bg-violet-500 text-white font-semibold;
 }
 
 .year-table,

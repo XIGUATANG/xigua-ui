@@ -22,6 +22,7 @@ import Input from 'components/Input/index'
 import CalendarSvg from '@/components/Svg/CalendarSvg'
 import type { PickerOptions } from '../type'
 import { formatToString } from '../type'
+import { isValidDateValue } from '../constant'
 
 // Date object and string
 const dateEquals = function (a: Date | any, b: Date | any) {
@@ -368,8 +369,8 @@ export default defineComponent({
       return pickerOptions.value.formatToString?.(value, props.format || '')
     }
 
-    const isValidValue = (value: Dayjs | unknown) => {
-      return pickerOptions.value.isValidValue?.(value)
+    const isValidValue = (value: unknown) => {
+      return isValidDateValue(value, props.disabledDate)
     }
 
     const handleKeydown = (event: KeyboardEvent) => {
@@ -409,7 +410,6 @@ export default defineComponent({
           isValidValue(parseUserInputToDayjs(displayValue.value))
         ) {
           handleChange()
-
           pickerVisible.value = false
         }
         event.stopPropagation()
@@ -457,7 +457,7 @@ export default defineComponent({
           parsedValue.value &&
             Array.isArray(parsedValue.value) &&
             parsedValue.value[1]
-        ]
+        ] as Dayjs[]
         if (isValidValue(newValue)) {
           emitInput(newValue)
           userInput.value = null
@@ -472,7 +472,7 @@ export default defineComponent({
         const newValue = [
           Array.isArray(parsedValue.value) && parsedValue.value[0],
           value
-        ]
+        ] as Dayjs[]
         if (isValidValue(newValue)) {
           emitInput(newValue)
           userInput.value = null
@@ -495,6 +495,7 @@ export default defineComponent({
     const onCalendarChange = (e: unknown) => {
       ctx.emit('calendar-change', e)
     }
+
     return () => (
       <Popper
         ref={refPopper}

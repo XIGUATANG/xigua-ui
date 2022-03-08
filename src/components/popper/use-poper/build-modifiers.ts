@@ -1,4 +1,4 @@
-import type { StrictModifiers, Placement, Modifier } from '@popperjs/core'
+import type { Placement, Modifier } from '@popperjs/core'
 
 interface ModifierProps {
   offset?: number;

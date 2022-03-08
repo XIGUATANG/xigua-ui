@@ -92,7 +92,7 @@ export const pickerDefaultProps = {
     type: Function
   },
   disabledDate: {
-    type: Function
+    type: Function as PropType<(date:Date)=>boolean>
   },
   cellClassName: {
     type: Function
@@ -201,7 +201,7 @@ export const datePickDefaultProps = {
     type: Function
   },
   disabledDate: {
-    type: Function
+    type: Function as PropType<(date:Date)=>boolean>
   },
   cellClassName: {
     type: Function

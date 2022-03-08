@@ -1,3 +1,4 @@
+import dayjs, { Dayjs } from 'dayjs'
 
 export const DEFAULT_FORMATS_TIME = 'HH:mm:ss'
 export const DEFAULT_FORMATS_DATE = 'YYYY-MM-DD'
@@ -30,3 +31,21 @@ export const MONTHS = [
   '11月',
   '12月'
 ]
+
+// export function isValidDateValue(value:Dayjs, disabledDate?:(date:Date)=>boolean):boolean
+// export function isValidDateValue(value:Dayjs[], disabledDate?:(date:Date)=>boolean):boolean
+export function isValidDateValue (value:unknown, disabledDate?:(date:Date)=>boolean):boolean {
+  if (Array.isArray(value)) {
+    const [start, end] = value
+    return (
+      isValidDateValue(start) &&
+      isValidDateValue(end) &&
+      start.valueOf() <= end.valueOf()
+    )
+  }
+  return (
+    dayjs.isDayjs(value) &&
+    value.isValid() &&
+    (disabledDate ? !disabledDate(value.toDate()) : true)
+  )
+}

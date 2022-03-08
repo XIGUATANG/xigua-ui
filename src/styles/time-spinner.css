@@ -4,6 +4,6 @@
 
 
 .time-panel-cell.active{
-  @apply bg-violet-500 text-white font-semibold;
+  @apply bg-violet-400 text-white font-semibold;
 }
 

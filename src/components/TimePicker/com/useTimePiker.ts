@@ -1,9 +1,12 @@
 
-const defList = (n:number, method?:(...params:any[])=>void, methodFunc?:(...params:any[])=>number[]) => {
+export const defList = (n:number, disabledDateByNumber?:(n:number)=>boolean, step = 1) => {
   const arr = []
-  const disabledArr = method && methodFunc?.()
-  for (let i = 0; i < n; i++) {
-    arr[i] = disabledArr ? disabledArr.includes(i) : false
+  for (let i = 0; i < n; i += step) {
+    arr.push({
+      value: i,
+      label: i < 10 ? `0${i}` : `${i}`,
+      disabled: disabledDateByNumber?.(i) ?? false
+    })
   }
   return arr
 }

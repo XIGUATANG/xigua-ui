@@ -2,7 +2,6 @@ import {
   defineComponent,
   ref,
   PropType,
-  watchEffect,
   computed,
   watch,
   inject
@@ -136,7 +135,7 @@ export default defineComponent({
     watch(parsedValue, () => setDefaultInnerDate(), { immediate: true })
 
     const selectionMode = computed(() => {
-      if (['week', 'month', 'year', 'dates'].includes(props.type)) {
+      if (['week', 'dates', 'month', 'year'].includes(props.type)) {
         return props.type
       }
       return 'day'
@@ -171,6 +170,8 @@ export default defineComponent({
       return year - (year % 10)
     }
 
+    const isWeek = computed(() => props.type.includes('week'))
+
     const yearStartValue = ref(yearStart())
 
     const handleYearPick = (year: number) => {
@@ -203,7 +204,9 @@ export default defineComponent({
       currentView,
       handleMonthPick,
       handleYearPick,
-      yearStartValue
+      yearStartValue,
+      selectionMode,
+      isWeek
     }
   },
 
@@ -248,7 +251,7 @@ export default defineComponent({
 
           {this.currentView === 'date' && (
             <DateTable
-              selectionMode="day"
+              selectionMode={this.isWeek ? 'week' : 'day'}
               parsedValue={this.parsedValue}
               onPick={this.handlePick}
               date={this.innerDate}

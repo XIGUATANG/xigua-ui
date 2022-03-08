@@ -38,7 +38,7 @@ function onPick(parmas: { minDate: Dayjs | null; maxDate: Dayjs | null }, visibl
 function onPick() {}
 export type OnPickFunction = typeof onPick
 
-export type SelectionMode = 'range' | 'day' | 'week' | 'weekrange'
+export type SelectionMode = 'range' | 'day' | 'week' | 'weekrange' | 'dates'
 
 export interface RangeState {
   endDate: null | Dayjs
@@ -158,7 +158,7 @@ export default defineComponent({
       return classes
     }
 
-    const getDateOfCell = (row: number, column: number) => {
+    const getCellDate = (row: number, column: number) => {
       const offsetFromStart = row * 7 + column
       return startDate.value.add(offsetFromStart, 'day')
     }
@@ -240,7 +240,7 @@ export default defineComponent({
       }
       const rowIndex = +target.getAttribute('data-row-index')!
       const columnIndex = +target.getAttribute('data-column-index')!
-      let cellDate = getDateOfCell(rowIndex, columnIndex)
+      let cellDate = getCellDate(rowIndex, columnIndex)
       if (props.selectionMode === 'range') {
         if (!props.rangeState.selecting) {
           props.onPick({ minDate: cellDate, maxDate: null })
@@ -255,13 +255,13 @@ export default defineComponent({
       } else if (props.selectionMode === 'weekrange') {
         if (!props.rangeState.selecting) {
           props.onPick({
-            minDate: getDateOfCell(rowIndex, 0),
-            maxDate: getDateOfCell(rowIndex, 6)
+            minDate: getCellDate(rowIndex, 0),
+            maxDate: getCellDate(rowIndex, 6)
           }, true)
         } else {
           let minDate = props.minDate
           let maxDate = cellDate
-          cellDate = getDateOfCell(rowIndex, 0)
+          cellDate = getCellDate(rowIndex, 0)
           if (cellDate.isSameOrAfter(props.minDate)) {
             minDate = props.minDate!
             maxDate = cellDate.add(6, 'days')
@@ -275,6 +275,8 @@ export default defineComponent({
         props.onSelect(!props.rangeState.selecting)
       } else if (props.selectionMode === 'day') {
         props.onPick(cellDate)
+      } else if (props.selectionMode === 'week') {
+        props.onPick(cellDate.startOf('week'))
       }
     }
 
@@ -287,13 +289,12 @@ export default defineComponent({
 
       const row = +target.getAttribute('data-row-index')!
       const column = +target.getAttribute('data-column-index')!
-      const cellDate = getDateOfCell(row, column)
       if (props.selectionMode === 'weekrange') {
         if (row !== lastRow.value) {
           lastRow.value = row
-          let cellDate = getDateOfCell(row, 6)
+          let cellDate = getCellDate(row, 6)
           if (cellDate.isBefore(props.minDate)) {
-            cellDate = getDateOfCell(row, 0)
+            cellDate = getCellDate(row, 0)
           }
           props.onChangeRange &&
             props.onChangeRange({
@@ -312,7 +313,7 @@ export default defineComponent({
           props.onChangeRange &&
             props.onChangeRange({
               selecting: true,
-              endDate: getDateOfCell(row, column)
+              endDate: getCellDate(row, column)
             })
         }
       }
@@ -337,8 +338,15 @@ export default defineComponent({
     const { onDateMouseEnter, onDateMouseLeave } = injectBase
 
     const handleCellEnter = (row: number, column: number) => {
-      const cellDate = getDateOfCell(row, column)
+      const cellDate = getCellDate(row, column)
       onDateMouseEnter(cellDate)
+    }
+
+    const getRowClasses = (rowIndex:number) => {
+      if (props.selectionMode !== 'week') return ''
+      const date = getCellDate(rowIndex, 0)
+      if (props.parsedValue && date.isSame(props.parsedValue as Dayjs, 'week')) return 'current-week'
+      return ''
     }
 
     const handleCellLeave = onDateMouseLeave
@@ -352,7 +360,8 @@ export default defineComponent({
       handleMouseMove,
       tableCalsses,
       handleCellEnter,
-      handleCellLeave
+      handleCellLeave,
+      getRowClasses
     }
   },
   render() {
@@ -367,7 +376,7 @@ export default defineComponent({
         </div>
         <div onClick={this.handleCellClick} onMousemove={this.handleMouseMove}>
           {this.rows.map((row, i) => (
-            <div key={`row_${i}`} class="flex cell-text date-row">
+            <div key={`row_${i}`} class={`flex cell-text date-row ${this.getRowClasses(i)}`}>
               {row.map((cell, j) => (
                 <span
                   onMouseenter={() =>
