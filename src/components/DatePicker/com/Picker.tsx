@@ -86,7 +86,7 @@ export default defineComponent({
     })
 
     const dateEnter = (day: Dayjs) => {
-      if (!Array.isArray(parsedValue.value) && parsedValue.value) {
+      if (!Array.isArray(parsedValue.value)) {
         placeHolderValue.value = formatDayjsToString(day) as string
       }
     }
@@ -168,10 +168,16 @@ export default defineComponent({
         _inputs[1].focus()
       }
     }
+
+    const showTime = computed(
+      () => props.type === 'datetime' || props.type === 'datetimerange'
+    )
+
     const onPick = (date: any = '', visible = false) => {
       placeHolderValue.value = ''
       pickerVisible.value = visible
       let result
+
       if (Array.isArray(date)) {
         result = date.map(_ => _.toDate())
       } else {
@@ -179,7 +185,11 @@ export default defineComponent({
         result = date ? date.toDate() : date
       }
       userInput.value = null
-      emitInput(result)
+      if (showTime.value) {
+        userInput.value = formatDayjsToString(date)
+      } else {
+        emitInput(result)
+      }
     }
 
     const focus = (focusStartInput = true) => {

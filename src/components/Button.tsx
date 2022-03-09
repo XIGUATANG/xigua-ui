@@ -103,7 +103,8 @@ export default defineComponent({
     loading: {
       type: Boolean,
       default: false
-    }
+    },
+    onClick: Function as PropType<(e:MouseEvent)=>void>
   },
   setup(props, { slots }) {
     let buttonTypeStyle = ` ${bgStyle[props.color]} text-white shadow-sm  border-transparent`
@@ -120,7 +121,7 @@ export default defineComponent({
         buttonTypeStyle += ` ${hoverBgStyle700[props.color]} ${focusRingStyle[props.color]}  focus:ring-2 focus:ring-offset-2`
       }
     }
-    const disableClass = props.disabled ? 'xg-button-disabled' : ''
+    const disableClass = computed(() => props.disabled ? 'xg-button-disabled' : '')
     const loadingTextClass =
       props.type === 'primary' ? 'text-white' : `${textStyle[props.color]}`
     const loadingClass = props.loading ? 'cursor-not-allowed' : ''
@@ -137,9 +138,14 @@ export default defineComponent({
           return '-ml-1 h-5 w-5 mr-2'
       }
     })
+    const handleClick = (e:MouseEvent) => {
+      if (props.loading || props.disabled) return
+      props.onClick?.(e)
+    }
     return () => (
       <button
-        class={`xg-button xg-button-${props.type} ${buttonTypeStyle}  ${disableClass} ${loadingClass} xg-button-${props.size}`}>
+      onClick={handleClick}
+        class={`xg-button xg-button-${props.type} ${buttonTypeStyle}  ${disableClass.value} ${loadingClass} xg-button-${props.size}`}>
         {props.loading ? (
           <SpinSvg
             class={`animate-spin ${spinClass.value} ${loadingTextClass}`}

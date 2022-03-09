@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, PropType, onBeforeUpdate, computed } from 'vue'
+import { defineComponent, ref, onMounted, PropType, onBeforeUpdate, computed, watch, watchEffect } from 'vue'
 import '@/styles/time-spinner.css'
 import dayjs, { Dayjs } from 'dayjs'
 import { DisabledDate } from '../types'
@@ -31,11 +31,11 @@ export default defineComponent({
   },
   setup(props) {
     const handleClick = (e: MouseEvent, i: number) => {
-      const item = e.target as HTMLElement
-      item.scrollIntoView({
-        block: 'start',
-        behavior: 'smooth'
-      })
+      // const item = e.target as HTMLElement
+      // item.scrollIntoView({
+      //   block: 'start',
+      //   behavior: 'smooth'
+      // })
       props.onPick(i)
     }
     const cellList = computed(() => {
@@ -50,10 +50,20 @@ export default defineComponent({
     onMounted(() => {
       if (props.value != null) {
         cells.value[props.value]?.scrollIntoView({
+          block: 'start',
+          behavior: 'smooth'
+        })
+      }
+    })
+
+    watchEffect(() => {
+      if (props.value != null) {
+        cells.value[props.value]?.scrollIntoView({
           block: 'start'
         })
       }
     })
+
     onBeforeUpdate(() => {
       cells.value = []
     })

@@ -18,6 +18,9 @@ import type { IDatePickerType, PickerOptions } from '../type'
 import { MONTHS } from '../constant'
 import MonthTable from './MonthTable'
 import YearTable from './YearTable'
+import { offset } from '@popperjs/core'
+import TimePicker from '@/components/TimePicker/com/TimePicker'
+import Button from '@/components/Button'
 
 export default defineComponent({
   name: 'DatePanel',
@@ -27,7 +30,7 @@ export default defineComponent({
       default: false
     },
     parsedValue: {
-      type: Object as PropType<Dayjs>
+      type: Object as PropType<Dayjs | Dayjs[]>
     },
     format: {
       type: String,
@@ -40,6 +43,7 @@ export default defineComponent({
     onPick: {
       type: Function as PropType<OnPickFunction>
     },
+    onConfirm: Function as PropType<OnPickFunction>,
     onSetPickerOption: {
       type: Function as PropType<
         <T extends keyof PickerOptions>(key: T, value: PickerOptions[T]) => void
@@ -51,13 +55,50 @@ export default defineComponent({
     const maxDate = ref<Dayjs | null>(dayjs().add(12, 'days'))
 
     const innerDate = ref<Dayjs>(dayjs())
+
+    const timeValue = computed(() => {
+      if (Array.isArray(props.parsedValue)) return props.parsedValue?.[0]
+      return props.parsedValue
+    })
+
+    const tempValue = ref(timeValue.value)
+
+    watch(timeValue, () => {
+      tempValue.value = timeValue.value?.clone()
+    })
+
+    const displayValue = computed(() => {
+      if (showTime.value) return tempValue.value || props.parsedValue
+      return props.parsedValue
+    })
+
     const handlePick: OnPickFunction = (
-      prams: Dayjs | { minDate: Dayjs | null; maxDate: Dayjs | null }
+      params: Dayjs | { minDate: Dayjs | null; maxDate: Dayjs | null }
     ) => {
-      if (isDayjs(prams)) {
-        props.onPick?.(prams)
+      if (isDayjs(params)) {
+        if (showTime.value) {
+          const value = timeValue.value || tempValue.value || dayjs()
+          tempValue.value = params.hour(value.hour()).second(value.second()).second(value.second())
+          props.onPick?.(tempValue.value, true)
+        } else props.onPick?.(params)
       }
     }
+
+    const handleTimePick = (
+      params: Dayjs
+    ) => {
+      if (showTime.value) {
+        tempValue.value = (tempValue.value || dayjs()).hour(params.hour()).minute(params.minute()).second(params.second()).millisecond(0)
+        props.onPick?.(tempValue.value, true)
+      }
+      if (isDayjs(params)) {
+        props.onPick?.(params, true)
+      }
+    }
+
+    const showTime = computed(
+      () => props.type === 'datetime' || props.type === 'datetimerange'
+    )
 
     const rangeState = ref<RangeState>({
       endDate: null,
@@ -120,8 +161,9 @@ export default defineComponent({
     const currentView = ref<'month' | 'date' | 'year'>('date')
 
     const setDefaultInnerDate = () => {
-      const year = (props.parsedValue || dayjs()).year()
-      const month = (props.parsedValue || dayjs()).month()
+      const year = (props.parsedValue as Dayjs || dayjs()).year()
+      const month = (props.parsedValue as Dayjs || dayjs()).month()
+      tempValue.value = undefined
 
       if (
         year !== innerDate.value.year() ||
@@ -166,7 +208,7 @@ export default defineComponent({
     )
 
     const yearStart = () => {
-      const year = (props.parsedValue || dayjs()).year()
+      const year = (props.parsedValue as Dayjs || dayjs()).year()
       return year - (year % 10)
     }
 
@@ -206,73 +248,94 @@ export default defineComponent({
       handleYearPick,
       yearStartValue,
       selectionMode,
-      isWeek
+      isWeek,
+      showTime,
+      timeValue,
+      handleTimePick,
+      tempValue,
+      displayValue
     }
   },
 
   render() {
     return (
-      <div class="inline-flex shadow-md rounded-xl divide-x-1 divide-gray-500 pt-5 px-6 pb-6">
-        <div>
-          <div class="flex justify-between items-center text-sm">
-            <div
-              onClick={this.handlePrev}
-              class="hover:bg-gray-100 rounded-lg cursor-pointer">
-              <LeftArrow />
-            </div>
-            <div>
-              {this.currentView === 'year' ? (
-                <span class="inline-flex items-center px-2 h-10">{`${
-                  this.yearStartValue
-                } - ${this.yearStartValue + 9}`}</span>
-              ) : (
-                <span
-                  onClick={() => (this.currentView = 'year')}
-                  class="hover:bg-gray-100 rounded-lg cursor-pointer inline-flex items-center px-2 h-10">
-                  {this.innerDate.year()}
-                </span>
-              )}
+      <div class="shadow-md rounded-xl pb-4 divide-y">
+        <div class="inline-flex divide-x pt-5 px-6">
+          <div>
+            <div class="flex justify-between items-center text-sm">
+              <div
+                onClick={this.handlePrev}
+                class="hover:bg-gray-100 rounded-lg cursor-pointer">
+                <LeftArrow />
+              </div>
+              <div>
+                {this.currentView === 'year' ? (
+                  <span class="inline-flex items-center px-2 h-10">{`${this.yearStartValue
+                    } - ${this.yearStartValue + 9}`}</span>
+                ) : (
+                  <span
+                    onClick={() => (this.currentView = 'year')}
+                    class="hover:bg-gray-100 rounded-lg cursor-pointer inline-flex items-center px-2 h-10">
+                    {this.innerDate.year()}
+                  </span>
+                )}
 
-              {this.currentView === 'date' ? (
-                <span
-                  onClick={() => (this.currentView = 'month')}
-                  class="hover:bg-gray-100 rounded-lg cursor-pointer inline-flex items-center px-2 h-10">
-                  {MONTHS[this.innerDate.month()]}
-                </span>
-              ) : null}
+                {this.currentView === 'date' ? (
+                  <span
+                    onClick={() => (this.currentView = 'month')}
+                    class="hover:bg-gray-100 rounded-lg cursor-pointer inline-flex items-center px-2 h-10">
+                    {MONTHS[this.innerDate.month()]}
+                  </span>
+                ) : null}
+              </div>
+
+              <div
+                onClick={this.handleNext}
+                class="hover:bg-gray-100 rounded-lg cursor-pointer">
+                <RightArrow />
+              </div>
             </div>
 
-            <div
-              onClick={this.handleNext}
-              class="hover:bg-gray-100 rounded-lg cursor-pointer">
-              <RightArrow />
-            </div>
+            {this.currentView === 'date' && (
+              <DateTable
+                selectionMode={this.isWeek ? 'week' : 'day'}
+                parsedValue={this.displayValue}
+                onPick={this.handlePick}
+                date={this.innerDate}
+              />
+            )}
+
+            {this.currentView === 'month' && (
+              <MonthTable
+                onPick={this.handleMonthPick}
+                month={this.innerDate.month()}></MonthTable>
+            )}
+            {this.currentView === 'year' && (
+              <YearTable
+                yearStart={this.yearStartValue}
+                year={(this.parsedValue as Dayjs)?.year()}
+                type={this.type}
+                onPick={this.handleYearPick}
+              />
+            )}
           </div>
-
-          {this.currentView === 'date' && (
-            <DateTable
-              selectionMode={this.isWeek ? 'week' : 'day'}
-              parsedValue={this.parsedValue}
-              onPick={this.handlePick}
-              date={this.innerDate}
-            />
-          )}
-
-          {this.currentView === 'month' && (
-            <MonthTable
-              onPick={this.handleMonthPick}
-              month={this.innerDate.month()}></MonthTable>
-          )}
-          {this.currentView === 'year' && (
-            <YearTable
-              yearStart={this.yearStartValue}
-              year={this.parsedValue?.year()}
-              type={this.type}
-              onPick={this.handleYearPick}
-            />
-          )}
+          {
+            this.showTime ? <div class="divide-y">
+              <div class="flex h-10 border-b-1 items-center justify-center text-14 text-gray-800">
+                {this.timeValue?.format('HH:mm:ss')}
+              </div>
+              <TimePicker value={this.timeValue || this.tempValue} onPick={this.handleTimePick} />
+            </div> : null
+          }
         </div>
+        {
+          this.showTime ? <div class="flex justify-end pt-2 pr-6">
+            <Button disabled={!this.tempValue} onClick={() => this.onConifrm?.(this.tempValue)} type="primary" size="small">确认</Button>
+          </div> : null
+        }
+
       </div>
+
     )
   }
 })

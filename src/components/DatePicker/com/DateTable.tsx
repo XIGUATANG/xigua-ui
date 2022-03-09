@@ -33,7 +33,7 @@ interface Cell {
   end: boolean
 }
 
-function onPick(parmas: Dayjs): void
+function onPick(parmas: Dayjs, visible?:boolean): void
 function onPick(parmas: { minDate: Dayjs | null; maxDate: Dayjs | null }, visible?:boolean): void
 function onPick() {}
 export type OnPickFunction = typeof onPick
