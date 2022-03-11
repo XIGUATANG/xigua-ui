@@ -22,6 +22,9 @@ module.exports = {
   //     }
   //   }
   // },
+  publicPath: process.env.NODE_ENV === 'production'
+    ? '/xigua-ui/'
+    : '/',
   chainWebpack: config => {
     config.module
     .rule('mjs$')
