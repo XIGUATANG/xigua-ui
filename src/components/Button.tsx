@@ -107,24 +107,28 @@ export default defineComponent({
     onClick: Function as PropType<(e:MouseEvent)=>void>
   },
   setup(props, { slots }) {
-    let buttonTypeStyle = ` ${bgStyle[props.color]} text-white shadow-sm  border-transparent`
-    if (props.type === 'outlined') {
-      buttonTypeStyle = ` ${textStyle[props.color]} ${borderStyle[props.color]}`
-    }
-    if (props.type === 'text') {
-      buttonTypeStyle = ` ${textStyle[props.color]} border-transparent`
-    }
-    if (!props.disabled && !props.loading) {
-      if (props.type === 'text' || props.type === 'outlined') {
-        buttonTypeStyle += ` ${hoverBgStyle[props.color]} ${focusBgStyle700[props.color]} hover:bg-opacity-5  hover:border-opacity-100  focus:bg-opacity-5  focus:border-opacity-100`
-      } else {
-        buttonTypeStyle += ` ${hoverBgStyle700[props.color]} ${focusRingStyle[props.color]}  focus:ring-2 focus:ring-offset-2`
+    const buttonTypeStyle = computed(() => {
+      let style = ` ${bgStyle[props.color]} text-white shadow-sm  border-transparent`
+      if (props.type === 'outlined') {
+        style = ` ${textStyle[props.color]} ${borderStyle[props.color]}`
       }
-    }
+      if (props.type === 'text') {
+        style = ` ${textStyle[props.color]} border-transparent`
+      }
+      if (!props.disabled && !props.loading) {
+        if (props.type === 'text' || props.type === 'outlined') {
+          style += ` ${hoverBgStyle[props.color]} ${focusBgStyle700[props.color]} hover:bg-opacity-5  hover:border-opacity-100  focus:bg-opacity-5  focus:border-opacity-100`
+        } else {
+          style += ` ${hoverBgStyle700[props.color]} ${focusRingStyle[props.color]}  focus:ring-2 focus:ring-offset-2`
+        }
+      }
+      return style
+    })
+
     const disableClass = computed(() => props.disabled ? 'xg-button-disabled' : '')
-    const loadingTextClass =
-      props.type === 'primary' ? 'text-white' : `${textStyle[props.color]}`
-    const loadingClass = props.loading ? 'cursor-not-allowed' : ''
+    const loadingTextClass = computed(() => props.type === 'primary' ? 'text-white' : `${textStyle[props.color]}`)
+
+    const loadingClass = computed(() => props.loading ? 'cursor-not-allowed' : '')
     const spinClass = computed(() => {
       switch (props.size) {
         case 'large':
@@ -145,10 +149,10 @@ export default defineComponent({
     return () => (
       <button
       onClick={handleClick}
-        class={`xg-button xg-button-${props.type} ${buttonTypeStyle}  ${disableClass.value} ${loadingClass} xg-button-${props.size}`}>
+        class={`xg-button xg-button-${props.type} ${buttonTypeStyle.value}  ${disableClass.value} ${loadingClass.value} xg-button-${props.size}`}>
         {props.loading ? (
           <SpinSvg
-            class={`animate-spin ${spinClass.value} ${loadingTextClass}`}
+            class={`animate-spin ${spinClass.value} ${loadingTextClass.value}`}
           />
         ) : null}
         {slots.default && slots.default()}

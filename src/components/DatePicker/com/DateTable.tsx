@@ -65,6 +65,7 @@ export default defineComponent({
         selecting: false
       })
     },
+    timeValue: Object as PropType<Dayjs>,
     minDate: {
       type: Object as PropType<Dayjs | null>
     },
@@ -339,7 +340,14 @@ export default defineComponent({
 
     const handleCellEnter = (row: number, column: number) => {
       const cellDate = getCellDate(row, column)
-      onDateMouseEnter(cellDate)
+      if (props.timeValue) {
+        onDateMouseEnter(
+          cellDate.hour(props.timeValue.hour())
+          .minute(props.timeValue.minute())
+          .second(props.timeValue.second()))
+      } else {
+        onDateMouseEnter(cellDate)
+      }
     }
 
     const getRowClasses = (rowIndex:number) => {

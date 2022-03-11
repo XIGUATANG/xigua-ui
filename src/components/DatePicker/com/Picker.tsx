@@ -173,7 +173,7 @@ export default defineComponent({
       () => props.type === 'datetime' || props.type === 'datetimerange'
     )
 
-    const onPick = (date: any = '', visible = false) => {
+    const onPick = (date: any = '', visible = false, conifrm = false) => {
       placeHolderValue.value = ''
       pickerVisible.value = visible
       let result
@@ -185,7 +185,7 @@ export default defineComponent({
         result = date ? date.toDate() : date
       }
       userInput.value = null
-      if (showTime.value) {
+      if (showTime.value && !conifrm) {
         userInput.value = formatDayjsToString(date)
       } else {
         emitInput(result)
@@ -593,6 +593,7 @@ export default defineComponent({
               selectionMode: 'day',
               visible: pickerVisible.value,
               onCalendarChange: onCalendarChange,
+              onConfirm: (v:Dayjs) => onPick(v, false, true),
               onMousedown: (e: Event) => e.stopPropagation()
             })
           }

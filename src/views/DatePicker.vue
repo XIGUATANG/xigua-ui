@@ -35,6 +35,7 @@ export default defineComponent({
         <DatePicker class="mt-2 w-96" type="weekrange" v-model={value5.value} />
         <DatePicker class="mt-2 w-96" type="datetime" v-model={value7.value} />
         <TimePicker v-model={value6.value} />
+        <div class="h-96"></div>
       </div>
     )
   }

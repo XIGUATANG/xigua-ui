@@ -44,6 +44,7 @@ export default defineComponent({
       type: Function as PropType<OnPickFunction>
     },
     onConfirm: Function as PropType<OnPickFunction>,
+
     onSetPickerOption: {
       type: Function as PropType<
         <T extends keyof PickerOptions>(key: T, value: PickerOptions[T]) => void
@@ -68,8 +69,8 @@ export default defineComponent({
     })
 
     const displayValue = computed(() => {
-      if (showTime.value) return tempValue.value || props.parsedValue
-      return props.parsedValue
+      if (showTime.value) return tempValue.value || timeValue.value as Dayjs
+      return props.parsedValue as Dayjs
     })
 
     const handlePick: OnPickFunction = (
@@ -298,6 +299,7 @@ export default defineComponent({
 
             {this.currentView === 'date' && (
               <DateTable
+              timeValue ={this.displayValue}
                 selectionMode={this.isWeek ? 'week' : 'day'}
                 parsedValue={this.displayValue}
                 onPick={this.handlePick}
@@ -322,18 +324,17 @@ export default defineComponent({
           {
             this.showTime ? <div class="divide-y">
               <div class="flex h-10 border-b-1 items-center justify-center text-14 text-gray-800">
-                {this.timeValue?.format('HH:mm:ss')}
+                {this.displayValue?.format('HH:mm:ss')}
               </div>
-              <TimePicker value={this.timeValue || this.tempValue} onPick={this.handleTimePick} />
+              <TimePicker value={this.displayValue as Dayjs} onPick={this.handleTimePick} />
             </div> : null
           }
         </div>
         {
           this.showTime ? <div class="flex justify-end pt-2 pr-6">
-            <Button disabled={!this.tempValue} onClick={() => this.onConifrm?.(this.tempValue)} type="primary" size="small">确认</Button>
+            <Button disabled={!this.tempValue} onClick={() => this.onConfirm?.(this.tempValue as Dayjs)} type="primary" size="small">确认</Button>
           </div> : null
         }
-
       </div>
 
     )
