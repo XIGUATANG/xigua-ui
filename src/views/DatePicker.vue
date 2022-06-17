@@ -15,6 +15,7 @@ export default defineComponent({
     const value5 = ref([dayjs().startOf('week').toDate(), dayjs().add(2, 'week').endOf('week').toDate()])
     const value6 = ref<Date>(new Date())
     const value7 = ref<Date>()
+
     return () => (
       <div>
         <DatePicker class="mt-2" type="date" v-model={value1.value} />

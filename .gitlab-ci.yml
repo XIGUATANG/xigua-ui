@@ -1,0 +1,43 @@
+image: node:16.13.2-slim
+
+
+stages: # 分段
+  - install
+  - eslint
+  - build
+  - deploy
+
+
+cache: # 缓存
+  paths:
+    - node_modules
+    - dist
+
+
+job_install:
+  tags:
+    - build
+  stage: install
+  script:
+    - echo "installing -------"
+    - npm install
+
+
+job_build:
+  tags:
+    - build
+  stage: build
+  script:
+    - echo "building -------"
+    - npm run build
+    - echo "build completed -------"
+
+
+  job_deploy:
+    image: docker
+    stage: deploy
+    script:
+     - echo "deploy job"
+      - docker build -t appimages .
+      - if [ $(docker ps -aq --filter name=app-container) ]; then docker rm -f app-container;fi
+      - docker run -d -p 80:80 --name xigua-ui appimages
